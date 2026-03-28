@@ -1,11 +1,10 @@
 const fetchIndiaNews = require("./fetchNews");
 
-async function test() {
+async function pipeline() {
   const articles = await fetchIndiaNews();
 
-  articles.slice(0, 5).forEach((a, i) => {
-    console.log(`${i + 1}. ${a.title}`);
-  });
+  console.log("Total articles fetched:", articles.length);
+  console.log("\nFirst article:\n", articles[0]);
 }
 
-test();
+pipeline();
