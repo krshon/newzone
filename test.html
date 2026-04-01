@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NewZone — AI Newsroom</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #000000;
+    --deep: #0a0a0a;
+    --surface: #111111;
+    --card: #161616;
+    --border: #222222;
+    --border-light: #2a2a2a;
+    --gold: #c9a84c;
+    --gold-dim: #8a6f2e;
+    --red: #e03434;
+    --cyan: #00d4ff;
+    --white: #f0ede8;
+    --muted: #888888;
+    --text: #d4d0cb;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+  /* ─── TOPBAR ─── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 58px;
+    background: var(--black);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 900;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--gold); }
+  .nav-pills { display: flex; gap: 4px; }
+  .nav-pill {
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid transparent;
+    color: var(--muted); background: transparent;
+    transition: all 0.2s;
+  }
+  .nav-pill:hover, .nav-pill.active {
+    background: var(--surface); border-color: var(--border);
+    color: var(--white);
+  }
+  .nav-pill.active { border-color: var(--gold-dim); color: var(--gold); }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 4px;
+    background: rgba(224, 52, 52, 0.15);
+    border: 1px solid rgba(224, 52, 52, 0.3);
+    font-size: 11px; font-weight: 600; color: var(--red);
+    letter-spacing: 1px; font-family: 'IBM Plex Mono', monospace;
+  }
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--red);
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: var(--black); cursor: pointer;
+  }
+
+  /* ─── TICKER ─── */
+  .ticker-wrap {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 7px 0; overflow: hidden; position: relative;
+  }
+  .ticker-wrap::before, .ticker-wrap::after {
+    content: ''; position: absolute; top: 0; height: 100%; width: 80px; z-index: 2;
+  }
+  .ticker-wrap::before { left: 0; background: linear-gradient(to right, var(--surface), transparent); }
+  .ticker-wrap::after { right: 0; background: linear-gradient(to left, var(--surface), transparent); }
+  .ticker { display: flex; gap: 48px; white-space: nowrap; animation: ticker 40s linear infinite; }
+  @keyframes ticker { 0%{transform:translateX(0);} 100%{transform:translateX(-50%);} }
+  .ticker-item {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-family: 'IBM Plex Mono', monospace;
+  }
+  .ticker-item .sym { color: var(--gold); font-weight: 600; }
+  .ticker-item .up { color: #4caf50; }
+  .ticker-item .dn { color: var(--red); }
+
+  /* ─── LAYOUT ─── */
+  .main { display: grid; grid-template-columns: 220px 1fr 300px; gap: 0; min-height: calc(100vh - 90px); }
+  .sidebar-l { padding: 20px 0; border-right: 1px solid var(--border); }
+  .sidebar-r { padding: 20px 16px; border-left: 1px solid var(--border); }
+  .center { padding: 24px 28px; }
+
+  /* ─── SECTION HEADS ─── */
+  .sec-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 2px;
+    color: var(--muted); text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 0 20px; margin-bottom: 10px;
+  }
+  .sec-divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* ─── SIDEBAR NAV ─── */
+  .side-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 20px; cursor: pointer;
+    font-size: 13.5px; font-weight: 400; color: var(--muted);
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+  }
+  .side-item:hover { color: var(--white); background: var(--surface); }
+  .side-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,168,76,0.05); }
+  .side-icon { font-size: 15px; }
+  .side-badge {
+    margin-left: auto; font-size: 10px; font-family: 'IBM Plex Mono', monospace;
+    background: var(--border); color: var(--muted);
+    padding: 1px 6px; border-radius: 3px;
+  }
+  .side-badge.hot { background: rgba(224,52,52,0.2); color: var(--red); }
+
+  /* ─── FEATURE TABS ─── */
+  .feature-tabs {
+    display: flex; gap: 0; border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .ftab {
+    padding: 10px 18px; font-size: 12.5px; font-weight: 500;
+    cursor: pointer; color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .ftab:hover { color: var(--text); }
+  .ftab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* ─── HERO NEWS CARD ─── */
+  .hero-card {
+    position: relative; border-radius: 8px; overflow: hidden;
+    margin-bottom: 20px; cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  .hero-img {
+    width: 100%; height: 280px; object-fit: cover;
+    display: block; filter: brightness(0.6);
+    transition: filter 0.4s, transform 0.4s;
+  }
+  .hero-card:hover .hero-img { filter: brightness(0.75); transform: scale(1.02); }
+  .hero-overlay {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 24px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.95));
+  }
+  .hero-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--white);
+    line-height: 1.3; margin-bottom: 8px;
+  }
+  .hero-meta { font-size: 12px; color: rgba(255,255,255,0.5); }
+  .hero-meta span { color: var(--cyan); }
+
+  /* ─── NEWS GRID ─── */
+  .news-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+  .news-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; overflow: hidden; cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .news-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+  .nc-img { width: 100%; height: 130px; object-fit: cover; display: block; filter: brightness(0.8); }
+  .nc-body { padding: 12px; }
+  .nc-tag { font-size: 10px; letter-spacing: 1px; color: var(--gold); font-weight: 600; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; margin-bottom: 6px; }
+  .nc-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: var(--white); line-height: 1.35; margin-bottom: 6px; }
+  .nc-meta { font-size: 11px; color: var(--muted); }
+
+  /* ─── LIST NEWS ─── */
+  .list-news { display: flex; flex-direction: column; gap: 0; }
+  .ln-item {
+    display: flex; gap: 12px; padding: 12px 0;
+    border-bottom: 1px solid var(--border); cursor: pointer;
+    transition: background 0.15s;
+  }
+  .ln-item:last-child { border-bottom: none; }
+  .ln-item:hover { background: rgba(255,255,255,0.02); }
+  .ln-img { width: 70px; height: 56px; object-fit: cover; border-radius: 4px; flex-shrink: 0; }
+  .ln-body { flex: 1; }
+  .ln-tag { font-size: 10px; color: var(--gold); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; margin-bottom: 3px; }
+  .ln-title { font-size: 13px; font-weight: 500; color: var(--white); line-height: 1.35; margin-bottom: 4px; }
+  .ln-meta { font-size: 11px; color: var(--muted); }
+
+  /* ─── RIGHT SIDEBAR WIDGETS ─── */
+  .widget { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .widget-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--gold); font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .widget-title span { color: var(--muted); font-weight: 400; cursor: pointer; }
+  .widget-title span:hover { color: var(--white); }
+
+  /* My ET Profile */
+  .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .ptag {
+    padding: 4px 10px; border-radius: 20px; font-size: 11px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; transition: all 0.2s;
+  }
+  .ptag:hover, .ptag.sel { background: rgba(201,168,76,0.15); border-color: var(--gold-dim); color: var(--gold); }
+  .profile-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* Story Arc */
+  .arc-story { display: flex; flex-direction: column; gap: 0; }
+  .arc-item { display: flex; gap: 10px; position: relative; padding-bottom: 14px; }
+  .arc-item:last-child { padding-bottom: 0; }
+  .arc-line { display: flex; flex-direction: column; align-items: center; }
+  .arc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); margin-top: 4px; flex-shrink: 0; }
+  .arc-stem { flex: 1; width: 1px; background: var(--border); margin-top: 2px; }
+  .arc-item:last-child .arc-stem { display: none; }
+  .arc-text { flex: 1; }
+  .arc-date { font-size: 10px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 2px; }
+  .arc-ttl { font-size: 12px; color: var(--text); line-height: 1.4; }
+  .arc-sent { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; margin-top: 3px; }
+  .arc-sent.bull { background: rgba(76,175,80,0.15); color: #4caf50; }
+  .arc-sent.bear { background: rgba(224,52,52,0.15); color: var(--red); }
+  .arc-sent.neut { background: rgba(0,212,255,0.1); color: var(--cyan); }
+
+  /* Market Pulse */
+  .mkt-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px;
+  }
+  .mkt-row:last-child { border-bottom: none; }
+  .mkt-name { color: var(--text); }
+  .mkt-val { font-family: 'IBM Plex Mono', monospace; }
+  .mkt-chg { font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .up { color: #4caf50; }
+  .dn { color: var(--red); }
+
+  /* Vernacular */
+  .lang-switcher { display: flex; gap: 6px; margin-bottom: 12px; }
+  .lang-btn {
+    padding: 4px 12px; border-radius: 4px; font-size: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+  }
+  .lang-btn:hover, .lang-btn.active {
+    background: rgba(201,168,76,0.12); border-color: var(--gold-dim); color: var(--gold);
+  }
+  .vern-card {
+    background: var(--surface); border-radius: 6px; padding: 12px;
+    font-size: 13px; line-height: 1.7; color: var(--text);
+    border-left: 3px solid var(--gold);
+  }
+  .vern-orig { font-size: 11px; color: var(--muted); margin-top: 8px; font-style: italic; }
+
+  /* AI Navigator Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); z-index: 200;
+    backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border-light);
+    border-radius: 12px; width: 700px; max-height: 85vh;
+    overflow-y: auto; padding: 28px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+  .modal-close {
+    float: right; cursor: pointer; font-size: 20px;
+    color: var(--muted); background: none; border: none; line-height: 1;
+  }
+  .modal-close:hover { color: var(--white); }
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--white);
+    margin-bottom: 4px; padding-right: 30px;
+  }
+  .modal-sub { font-size: 12px; color: var(--gold); margin-bottom: 20px; font-family: 'IBM Plex Mono', monospace; }
+  .modal-body { font-size: 14px; color: var(--text); line-height: 1.8; margin-bottom: 20px; }
+  .modal-body p { margin-bottom: 14px; }
+  .modal-body strong { color: var(--white); }
+  .follow-qs { margin-top: 16px; }
+  .follow-q {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 6px;
+    margin-bottom: 8px; cursor: pointer; font-size: 13px;
+    color: var(--text); transition: all 0.2s;
+  }
+  .follow-q:hover { border-color: var(--gold-dim); color: var(--white); }
+  .follow-q::before { content: '→'; color: var(--gold); }
+  .ai-response-area {
+    background: var(--card); border: 1px solid var(--border-light);
+    border-radius: 8px; padding: 16px; margin-top: 16px;
+    font-size: 13.5px; line-height: 1.8; color: var(--text);
+    min-height: 80px; display: none;
+  }
+  .ai-response-area.visible { display: block; }
+  .typing-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--gold); margin-right: 3px; animation: blink 1s infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,100%{opacity:0.2;} 50%{opacity:1;} }
+
+  /* Video Studio Modal */
+  .video-player {
+    background: #000; border-radius: 8px; height: 220px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 16px; position: relative; overflow: hidden;
+  }
+  .vp-bg {
+    position: absolute; inset: 0; object-fit: cover; opacity: 0.4;
+    width: 100%; height: 100%;
+  }
+  .vp-overlay { position: relative; z-index: 2; text-align: center; }
+  .play-btn {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: rgba(201,168,76,0.9); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--black); margin: 0 auto 10px;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .play-btn:hover { transform: scale(1.08); background: var(--gold); }
+  .vp-dur { font-size: 12px; color: rgba(255,255,255,0.6); font-family: 'IBM Plex Mono', monospace; }
+  .video-progress { height: 3px; background: var(--border); border-radius: 2px; margin-bottom: 12px; }
+  .vp-fill { height: 100%; width: 35%; background: var(--gold); border-radius: 2px; }
+  .video-meta-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+  .gen-btn {
+    width: 100%; padding: 11px; margin-top: 14px;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    border: none; border-radius: 6px; color: var(--black);
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    letter-spacing: 0.5px; transition: opacity 0.2s;
+  }
+  .gen-btn:hover { opacity: 0.9; }
+
+  /* Pulse animation for live */
+  @keyframes livepulse { 0%,100%{box-shadow:0 0 0 0 rgba(224,52,52,0.4);} 50%{box-shadow:0 0 0 8px rgba(224,52,52,0);} }
+
+  /* Trending Topics */
+  .trend-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .trend-item:last-child { border-bottom: none; }
+  .trend-item:hover .trend-title { color: var(--gold); }
+  .trend-num { font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--muted); width: 16px; }
+  .trend-body { flex: 1; }
+  .trend-title { font-size: 12.5px; color: var(--text); }
+  .trend-count { font-size: 10px; color: var(--muted); }
+  .trend-arrow { font-size: 10px; color: var(--muted); }
+
+  /* Panels */
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .panel-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--white); }
+  .panel-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .ai-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 4px;
+    background: rgba(201,168,76,0.1); border: 1px solid var(--gold-dim);
+    font-size: 10px; color: var(--gold); font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Personalization grid */
+  .persona-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+  .persona-card {
+    padding: 14px; border-radius: 8px; cursor: pointer;
+    border: 2px solid var(--border); background: var(--card);
+    text-align: center; transition: all 0.2s;
+  }
+  .persona-card:hover, .persona-card.sel {
+    border-color: var(--gold); background: rgba(201,168,76,0.07);
+  }
+  .persona-icon { font-size: 24px; margin-bottom: 6px; }
+  .persona-name { font-size: 11px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
+  .persona-desc { font-size: 10px; color: var(--muted); line-height: 1.4; }
+
+  /* Story Arc panel */
+  .arc-search {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 14px; color: var(--white);
+    font-size: 13px; margin-bottom: 16px; outline: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .arc-search:focus { border-color: var(--gold-dim); }
+  .arc-stories-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .arc-chip {
+    padding: 5px 12px; border-radius: 20px; font-size: 12px;
+    background: var(--card); border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+  }
+  .arc-chip:hover, .arc-chip.active {
+    background: rgba(201,168,76,0.12); border-color: var(--gold-dim); color: var(--gold);
+  }
+  .arc-visual {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px;
+  }
+  .arc-vis-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 14px; }
+  .timeline { position: relative; padding-left: 20px; }
+  .timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+  .tl-item { position: relative; padding-bottom: 18px; }
+  .tl-item::before { content: ''; position: absolute; left: -16px; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+  .tl-date { font-size: 10px; color: var(--gold); font-family: 'IBM Plex Mono', monospace; margin-bottom: 3px; }
+  .tl-event { font-size: 13px; color: var(--text); line-height: 1.4; }
+  .players-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .player-chip {
+    padding: 5px 10px; border-radius: 4px;
+    background: var(--surface); border: 1px solid var(--border);
+    font-size: 11px; color: var(--text);
+  }
+  .player-chip .role { color: var(--muted); font-size: 10px; }
+  .watchlist { margin-top: 14px; background: rgba(201,168,76,0.05); border-radius: 6px; padding: 12px; border: 1px dashed var(--gold-dim); }
+  .watchlist-title { font-size: 11px; color: var(--gold); font-weight: 600; margin-bottom: 8px; letter-spacing: 1px; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace; }
+  .watch-item { font-size: 12px; color: var(--text); padding: 3px 0; display: flex; gap: 6px; }
+  .watch-item::before { content: '◦'; color: var(--gold); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar-l, .sidebar-r { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="logo">New<span>Zone</span></div>
+  <nav class="nav-pills">
+    <div class="nav-pill active" onclick="setPanel('home')">Feed</div>
+    <div class="nav-pill" onclick="setPanel('myet')">My ET</div>
+    <div class="nav-pill" onclick="setPanel('navigator')">AI Navigator</div>
+    <div class="nav-pill" onclick="setPanel('video')">Video Studio</div>
+    <div class="nav-pill" onclick="setPanel('arc')">Story Arc</div>
+    <div class="nav-pill" onclick="setPanel('vernacular')">Vernacular</div>
+  </nav>
+  <div class="topbar-right">
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <div class="avatar">AB</div>
+  </div>
+</header>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker" id="ticker">
+    <span class="ticker-item"><span class="sym">SENSEX</span> <span class="up">73,847.23 ▲ 412.50</span></span>
+    <span class="ticker-item"><span class="sym">NIFTY 50</span> <span class="up">22,384.65 ▲ 128.30</span></span>
+    <span class="ticker-item"><span class="sym">RELIANCE</span> <span class="dn">2,854.10 ▼ 18.45</span></span>
+    <span class="ticker-item"><span class="sym">TCS</span> <span class="up">3,921.80 ▲ 43.20</span></span>
+    <span class="ticker-item"><span class="sym">HDFC BANK</span> <span class="up">1,578.55 ▲ 21.10</span></span>
+    <span class="ticker-item"><span class="sym">INFOSYS</span> <span class="dn">1,432.40 ▼ 9.75</span></span>
+    <span class="ticker-item"><span class="sym">USD/INR</span> <span>83.42</span></span>
+    <span class="ticker-item"><span class="sym">GOLD</span> <span class="up">₹72,340 ▲ 280</span></span>
+    <span class="ticker-item"><span class="sym">CRUDE OIL</span> <span class="dn">$83.12 ▼ 0.58</span></span>
+    <span class="ticker-item"><span class="sym">WIPRO</span> <span class="up">482.30 ▲ 5.80</span></span>
+    <span class="ticker-item"><span class="sym">BAJAJ FIN</span> <span class="up">7,124.50 ▲ 89.20</span></span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><span class="sym">SENSEX</span> <span class="up">73,847.23 ▲ 412.50</span></span>
+    <span class="ticker-item"><span class="sym">NIFTY 50</span> <span class="up">22,384.65 ▲ 128.30</span></span>
+    <span class="ticker-item"><span class="sym">RELIANCE</span> <span class="dn">2,854.10 ▼ 18.45</span></span>
+    <span class="ticker-item"><span class="sym">TCS</span> <span class="up">3,921.80 ▲ 43.20</span></span>
+    <span class="ticker-item"><span class="sym">HDFC BANK</span> <span class="up">1,578.55 ▲ 21.10</span></span>
+    <span class="ticker-item"><span class="sym">INFOSYS</span> <span class="dn">1,432.40 ▼ 9.75</span></span>
+    <span class="ticker-item"><span class="sym">USD/INR</span> <span>83.42</span></span>
+    <span class="ticker-item"><span class="sym">GOLD</span> <span class="up">₹72,340 ▲ 280</span></span>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar-l">
+    <div class="sec-label">Sections</div>
+    <div class="side-item active" onclick="setPanel('home')"><span class="side-icon">◈</span>Top Stories<span class="side-badge hot">NEW</span></div>
+    <div class="side-item" onclick="setPanel('myet')"><span class="side-icon">✦</span>My ET Feed</div>
+    <div class="side-item" onclick="setPanel('navigator')"><span class="side-icon">⬡</span>AI Navigator</div>
+    <div class="side-item" onclick="setPanel('video')"><span class="side-icon">▶</span>Video Studio</div>
+    <div class="side-item" onclick="setPanel('arc')"><span class="side-icon">◎</span>Story Arc</div>
+    <div class="side-item" onclick="setPanel('vernacular')"><span class="side-icon">अ</span>Vernacular</div>
+    <div class="sec-divider"></div>
+    <div class="sec-label">Topics</div>
+    <div class="side-item"><span class="side-icon">📈</span>Markets</div>
+    <div class="side-item"><span class="side-icon">🏦</span>Banking</div>
+    <div class="side-item"><span class="side-icon">🚀</span>Startups<span class="side-badge hot">12</span></div>
+    <div class="side-item"><span class="side-icon">🏛️</span>Policy</div>
+    <div class="side-item"><span class="side-icon">🌏</span>Global</div>
+    <div class="side-item"><span class="side-icon">⚡</span>Tech</div>
+    <div class="sec-divider"></div>
+    <div class="sec-label">Saved</div>
+    <div class="side-item"><span class="side-icon">🔖</span>Bookmarks<span class="side-badge">3</span></div>
+    <div class="side-item"><span class="side-icon">📊</span>Watchlist</div>
+  </aside>
+
+  <!-- CENTER CONTENT -->
+  <main class="center">
+
+    <!-- ── HOME PANEL ── -->
+    <div class="panel active" id="panel-home">
+      <div class="feature-tabs">
+        <div class="ftab active">For You</div>
+        <div class="ftab">Trending</div>
+        <div class="ftab">Markets</div>
+        <div class="ftab">Startups</div>
+        <div class="ftab">Policy</div>
+        <div class="ftab">Global</div>
+      </div>
+
+      <!-- HERO -->
+      <div class="hero-card" onclick="openNavigator('rbi-rate')">
+        <img class="hero-img" src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=900&q=80" alt="RBI">
+        <div class="hero-overlay">
+          <div class="hero-tag">⬡ AI Deep Briefing Available</div>
+          <div class="hero-title">RBI Holds Repo Rate at 6.5% — Governor Das Signals Pivot Watch Ahead of Q1 GDP Data</div>
+          <div class="hero-meta">Economic Times · <span>23 min ago</span> · 4 min read · <span>Click to open AI Navigator →</span></div>
+        </div>
+      </div>
+
+      <!-- NEWS GRID -->
+      <div class="news-grid">
+        <div class="news-card" onclick="openVideo()">
+          <img class="nc-img" src="https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=600&q=80" alt="">
+          <div class="nc-body">
+            <div class="nc-tag">▶ Video · Markets</div>
+            <div class="nc-title">Sensex Surges 412 Pts as FIIs Return to Indian Equities After 6-Week Gap</div>
+            <div class="nc-meta">ET Markets · 1 hr ago</div>
+          </div>
+        </div>
+        <div class="news-card" onclick="openNavigator('budget')">
+          <img class="nc-img" src="https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=600&q=80" alt="">
+          <div class="nc-body">
+            <div class="nc-tag">⬡ AI Briefing · Policy</div>
+            <div class="nc-title">Union Budget 2025: ₹11.1 Lakh Crore Capex Push — Infrastructure & Green Energy Winners</div>
+            <div class="nc-meta">ET Policy · 2 hr ago</div>
+          </div>
+        </div>
+        <div class="news-card">
+          <img class="nc-img" src="https://images.unsplash.com/photo-1559526324-593bc073d938?w=600&q=80" alt="">
+          <div class="nc-body">
+            <div class="nc-tag">🚀 Startups</div>
+            <div class="nc-title">Zepto Raises $350M at $5B Valuation; Eyes Pre-IPO Round by Q3 2025</div>
+            <div class="nc-meta">ET Startup · 3 hr ago</div>
+          </div>
+        </div>
+        <div class="news-card">
+          <img class="nc-img" src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80" alt="">
+          <div class="nc-body">
+            <div class="nc-tag">⚡ Tech</div>
+            <div class="nc-title">Jio's AI-First 5G Strategy: 500M Users, Edge Computing & Domestic LLM Play by 2026</div>
+            <div class="nc-meta">ET Tech · 4 hr ago</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIST NEWS -->
+      <div class="sec-label" style="padding:0; margin-bottom:12px;">More Stories</div>
+      <div class="list-news">
+        <div class="ln-item">
+          <img class="ln-img" src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=200&q=80" alt="">
+          <div class="ln-body">
+            <div class="ln-tag">Banking</div>
+            <div class="ln-title">SBI Q3 Profit Rises 35% YoY to ₹16,891 Crore; NPA Ratios at Multi-Decade Lows</div>
+            <div class="ln-meta">5 hr ago · 3 min read</div>
+          </div>
+        </div>
+        <div class="ln-item">
+          <img class="ln-img" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=200&q=80" alt="">
+          <div class="ln-body">
+            <div class="ln-tag">Policy</div>
+            <div class="ln-title">PLI Scheme 2.0 Expands to 12 New Sectors Including EVs, Drones & Specialty Chemicals</div>
+            <div class="ln-meta">6 hr ago · 4 min read</div>
+          </div>
+        </div>
+        <div class="ln-item">
+          <img class="ln-img" src="https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=200&q=80" alt="">
+          <div class="ln-body">
+            <div class="ln-tag">Global · Trade</div>
+            <div class="ln-title">India-UAE CEPA Trade Crosses $100B Mark; Bilateral Talks Target $250B by 2030</div>
+            <div class="ln-meta">7 hr ago · 3 min read</div>
+          </div>
+        </div>
+        <div class="ln-item">
+          <img class="ln-img" src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=200&q=80" alt="">
+          <div class="ln-body">
+            <div class="ln-tag">Startups</div>
+            <div class="ln-title">SEBI Approves SME Exchange Reforms; Simplified Listing to Boost Bharat-Focused Startups</div>
+            <div class="ln-meta">8 hr ago · 2 min read</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MY ET PANEL ── -->
+    <div class="panel" id="panel-myet">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">My ET — Personalized Newsroom</div>
+          <div class="panel-sub">News curated to your financial life and career</div>
+        </div>
+        <div class="ai-chip">✦ AI Powered</div>
+      </div>
+      <div class="sec-label" style="padding:0;margin-bottom:10px;">Choose your persona</div>
+      <div class="persona-grid">
+        <div class="persona-card sel" onclick="selectPersona(this,'Mutual Fund Investor')">
+          <div class="persona-icon">📊</div>
+          <div class="persona-name">MF Investor</div>
+          <div class="persona-desc">Portfolio-relevant stories, NAV moves, fund manager calls</div>
+        </div>
+        <div class="persona-card" onclick="selectPersona(this,'Startup Founder')">
+          <div class="persona-icon">🚀</div>
+          <div class="persona-name">Startup Founder</div>
+          <div class="persona-desc">Funding rounds, competitor intel, regulatory updates</div>
+        </div>
+        <div class="persona-card" onclick="selectPersona(this,'Student / Learner')">
+          <div class="persona-icon">🎓</div>
+          <div class="persona-name">Student</div>
+          <div class="persona-desc">Explainer-first content, plain-language finance, career news</div>
+        </div>
+        <div class="persona-card" onclick="selectPersona(this,'Corporate Executive')">
+          <div class="persona-icon">💼</div>
+          <div class="persona-name">Executive</div>
+          <div class="persona-desc">M&A deals, leadership moves, macro strategy insights</div>
+        </div>
+        <div class="persona-card" onclick="selectPersona(this,'Retail Trader')">
+          <div class="persona-icon">📈</div>
+          <div class="persona-name">Trader</div>
+          <div class="persona-desc">Intraday triggers, F&O data, technical analysis news</div>
+        </div>
+        <div class="persona-card" onclick="selectPersona(this,'Policy Watcher')">
+          <div class="persona-icon">🏛️</div>
+          <div class="persona-name">Policy Watcher</div>
+          <div class="persona-desc">Budget, RBI, SEBI, government schemes & regulations</div>
+        </div>
+      </div>
+      <div id="persona-feed">
+        <div class="sec-label" style="padding:0;margin-bottom:12px;">Your curated feed · <span style="color:var(--gold);font-size:11px;" id="persona-label">MF Investor</span></div>
+        <div class="list-news" id="persona-news">
+          <div class="ln-item"><img class="ln-img" src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=200&q=80" alt=""><div class="ln-body"><div class="ln-tag">Mutual Funds</div><div class="ln-title">Mirae Asset Flexi Cap Cuts IT Exposure by 8% — CIO Cites Overvaluation in Largecap Tech</div><div class="ln-meta">Relevant to your SIP portfolios · 1 hr ago</div></div></div>
+          <div class="ln-item"><img class="ln-img" src="https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=200&q=80" alt=""><div class="ln-body"><div class="ln-tag">Debt Funds</div><div class="ln-title">RBI Rate Hold Boosts Long-Duration Bond Funds — Yield Curve Flattening Signals Opportunity</div><div class="ln-meta">NAV impact: Medium-term positive · 2 hr ago</div></div></div>
+          <div class="ln-item"><img class="ln-img" src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=200&q=80" alt=""><div class="ln-body"><div class="ln-tag">Equity</div><div class="ln-title">Smallcap Index Correction: 3 Fund Managers Reveal Whether They Are Buying the Dip</div><div class="ln-meta">Your smallcap funds may be affected · 3 hr ago</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NAVIGATOR PANEL ── -->
+    <div class="panel" id="panel-navigator">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">AI News Navigator</div>
+          <div class="panel-sub">Interactive intelligence briefings — one deep dive replaces 8 articles</div>
+        </div>
+        <div class="ai-chip">⬡ Deep Briefing</div>
+      </div>
+      <div class="arc-stories-list">
+        <div class="arc-chip active" onclick="loadBriefing('rbi','this')">RBI Rate Decision</div>
+        <div class="arc-chip" onclick="loadBriefing('budget','this')">Union Budget 2025</div>
+        <div class="arc-chip" onclick="loadBriefing('adani','this')">Adani Group</div>
+        <div class="arc-chip" onclick="loadBriefing('upi','this')">UPI Global Expansion</div>
+        <div class="arc-chip" onclick="loadBriefing('ev','this')">India EV Market</div>
+      </div>
+      <div class="arc-visual" id="briefing-area">
+        <div class="arc-vis-title">📋 RBI Monetary Policy — April 2025 Deep Briefing</div>
+        <div style="font-size:13.5px;line-height:1.85;color:var(--text);margin-bottom:16px;">
+          <p><strong style="color:var(--white);">The Decision:</strong> The Reserve Bank of India's Monetary Policy Committee voted 4-2 to hold the repo rate at 6.5% for the eighth consecutive meeting, maintaining its stance of "withdrawal of accommodation" even as global central banks signal pivot timelines.</p>
+          <p><strong style="color:var(--white);">Why It Matters:</strong> India's CPI inflation remained sticky at 5.1% in March, driven by food prices — particularly pulses and vegetables — keeping the MPC cautious. Core inflation, however, dipped to 3.4%, the lowest since 2020.</p>
+          <p><strong style="color:var(--white);">Market Reaction:</strong> Sensex rallied 412 points as traders interpreted the hold as "rate cut priced in for Q2." 10-year G-sec yields softened to 7.02%. Banking stocks outperformed with HDFC Bank and SBI leading gains.</p>
+        </div>
+        <div class="follow-qs">
+          <div class="sec-label" style="padding:0;margin-bottom:8px;">Ask a follow-up question</div>
+          <div class="follow-q" onclick="askFollowUp('What impact does this have on EMI borrowers?')">What impact does this have on EMI borrowers?</div>
+          <div class="follow-q" onclick="askFollowUp('Which sectors benefit most from the rate hold?')">Which sectors benefit most from the rate hold?</div>
+          <div class="follow-q" onclick="askFollowUp('When will RBI likely cut rates?')">When will RBI likely cut rates?</div>
+          <div class="follow-q" onclick="askFollowUp('How does this compare to US Fed and ECB stances?')">How does this compare to US Fed and ECB stances?</div>
+        </div>
+        <div class="ai-response-area" id="ai-response"></div>
+      </div>
+    </div>
+
+    <!-- ── VIDEO STUDIO PANEL ── -->
+    <div class="panel" id="panel-video">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">AI News Video Studio</div>
+          <div class="panel-sub">Transform any article into broadcast-quality 60–120s video</div>
+        </div>
+        <div class="ai-chip">▶ Auto-Generate</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+        <div class="news-card" onclick="loadVideo(this,'RBI Rate Hold','https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=700&q=80')" style="cursor:pointer;">
+          <img class="nc-img" src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=80" alt="">
+          <div class="nc-body">
+            <div class="nc-tag">▶ Generate Video</div>
+            <div class="nc-title">RBI Holds Repo Rate — Full Policy Explainer</div>
+            <div class="nc-meta">90 sec · Auto-narration ready</div>
+          </div>
+        </div>
+        <div class="news-card" onclick="loadVideo(this,'Sensex Rally','https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=700&q=80')" style="cursor:pointer;">
+          <img class="nc-img" src="https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=600&q=80" alt="">
+          <div class="nc-body">
+            <div class="nc-tag">▶ Generate Video</div>
+            <div class="nc-title">Sensex +412 pts — FII Return Story</div>
+            <div class="nc-meta">60 sec · Data viz included</div>
+          </div>
+        </div>
+      </div>
+      <!-- Player -->
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;" id="video-player-area">
+        <div class="arc-vis-title" style="margin-bottom:14px;" id="video-title">▶ RBI Rate Hold — AI Generated Briefing</div>
+        <div class="video-player">
+          <img class="vp-bg" id="video-thumb" src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=700&q=80" alt="">
+          <div class="vp-overlay">
+            <button class="play-btn" onclick="togglePlay()" id="playbtn">▶</button>
+            <div class="vp-dur" id="vp-time">0:00 / 1:30</div>
+          </div>
+        </div>
+        <div class="video-progress"><div class="vp-fill" id="vp-bar"></div></div>
+        <div class="video-meta-row">
+          <span id="vp-script">AI Narration: "The RBI's monetary policy committee voted to hold the repo rate at 6.5%..."</span>
+          <span id="vp-badge">90s · HD</span>
+        </div>
+        <button class="gen-btn" onclick="generateNewVideo()">⚡ Generate New Video from Today's Top Story</button>
+      </div>
+    </div>
+
+    <!-- ── STORY ARC PANEL ── -->
+    <div class="panel" id="panel-arc">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Story Arc Tracker</div>
+          <div class="panel-sub">Complete visual narrative of any ongoing business story</div>
+        </div>
+        <div class="ai-chip">◎ Timeline + Players</div>
+      </div>
+      <input class="arc-search" placeholder="Search any ongoing story (e.g. 'Adani', 'Paytm', 'India-China trade'...)" oninput="filterArc(this.value)">
+      <div class="arc-stories-list">
+        <div class="arc-chip active" onclick="selectArc(this,'adani')">Adani Group Saga</div>
+        <div class="arc-chip" onclick="selectArc(this,'paytm')">Paytm Banking Crisis</div>
+        <div class="arc-chip" onclick="selectArc(this,'jio')">Jio Financial Services</div>
+        <div class="arc-chip" onclick="selectArc(this,'byju')">BYJU's Collapse</div>
+        <div class="arc-chip" onclick="selectArc(this,'upi')">UPI Globalization</div>
+      </div>
+      <div class="arc-visual" id="arc-display">
+        <div class="arc-vis-title">🏢 Adani Group — Complete Story Arc</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-date">Jan 24, 2023</div>
+            <div class="tl-event">Hindenburg Research publishes damning short-seller report alleging stock manipulation and accounting fraud across Adani Group companies</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">Feb 2023</div>
+            <div class="tl-event">Group loses $150B+ in market cap; Adani cancels ₹20,000 crore FPO citing investor concern</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">Mar 2023</div>
+            <div class="tl-event">Supreme Court orders SEBI probe; GQG Partners invests $1.87B — first major institutional vote of confidence</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">Jan 2024</div>
+            <div class="tl-event">SEBI submits clean report to SC; stocks recover 60–80% from lows; Adani Green hits new highs</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">Nov 2024</div>
+            <div class="tl-event">US DOJ indictment names Gautam Adani over alleged solar energy bribery; group denies all charges</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-date">Mar 2025</div>
+            <div class="tl-event">Adani Group secures $3.2B refinancing from international banks; Q3 FY25 EBITDA hits all-time high</div>
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <div class="sec-label" style="padding:0;margin-bottom:8px;">Key Players</div>
+          <div class="players-grid">
+            <div class="player-chip">Gautam Adani <div class="role">Chairman</div></div>
+            <div class="player-chip">Hindenburg Research <div class="role">Short Seller</div></div>
+            <div class="player-chip">SEBI <div class="role">Regulator</div></div>
+            <div class="player-chip">GQG Partners <div class="role">Investor</div></div>
+            <div class="player-chip">Supreme Court <div class="role">Oversight</div></div>
+            <div class="player-chip">US DOJ <div class="role">Prosecutor</div></div>
+          </div>
+        </div>
+        <div class="watchlist">
+          <div class="watchlist-title">👁 What to Watch Next</div>
+          <div class="watch-item">US DOJ case resolution — potential plea or dismissal timeline Q2 2025</div>
+          <div class="watch-item">Adani Green renewable target of 45GW by 2030 — quarterly progress</div>
+          <div class="watch-item">International institutional investor sentiment — key lagging indicator</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VERNACULAR PANEL ── -->
+    <div class="panel" id="panel-vernacular">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Vernacular Business News Engine</div>
+          <div class="panel-sub">Real-time, context-aware translation of ET business news</div>
+        </div>
+        <div class="ai-chip">अ Real-time Translation</div>
+      </div>
+      <div class="lang-switcher" style="margin-bottom:20px;">
+        <div class="lang-btn active" onclick="setLang('en',this)">English</div>
+        <div class="lang-btn" onclick="setLang('hi',this)">हिंदी</div>
+        <div class="lang-btn" onclick="setLang('ta',this)">தமிழ்</div>
+      </div>
+      <div class="list-news" id="vern-feed">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar-r">
+
+    <!-- Market Pulse -->
+    <div class="widget">
+      <div class="widget-title">Market Pulse <span>Full →</span></div>
+      <div class="mkt-row"><span class="mkt-name">SENSEX</span><span class="mkt-val up">73,847</span><span class="mkt-chg up">+0.56%</span></div>
+      <div class="mkt-row"><span class="mkt-name">NIFTY 50</span><span class="mkt-val up">22,384</span><span class="mkt-chg up">+0.58%</span></div>
+      <div class="mkt-row"><span class="mkt-name">BANK NIFTY</span><span class="mkt-val up">47,291</span><span class="mkt-chg up">+0.82%</span></div>
+      <div class="mkt-row"><span class="mkt-name">USD/INR</span><span class="mkt-val">83.42</span><span class="mkt-chg" style="color:var(--muted)">—</span></div>
+      <div class="mkt-row"><span class="mkt-name">GOLD</span><span class="mkt-val up">₹72,340</span><span class="mkt-chg up">+0.39%</span></div>
+      <div class="mkt-row"><span class="mkt-name">CRUDE</span><span class="mkt-val dn">$83.12</span><span class="mkt-chg dn">-0.69%</span></div>
+    </div>
+
+    <!-- Story Arc Sidebar -->
+    <div class="widget">
+      <div class="widget-title">Story Arc Tracker <span onclick="setPanel('arc')">Open →</span></div>
+      <div class="arc-story">
+        <div class="arc-item">
+          <div class="arc-line"><div class="arc-dot"></div><div class="arc-stem"></div></div>
+          <div class="arc-text">
+            <div class="arc-date">Mar 29, 2025</div>
+            <div class="arc-ttl">RBI holds rates; signals possible cut in June</div>
+            <div class="arc-sent bull">Bullish</div>
+          </div>
+        </div>
+        <div class="arc-item">
+          <div class="arc-line"><div class="arc-dot"></div><div class="arc-stem"></div></div>
+          <div class="arc-text">
+            <div class="arc-date">Mar 22, 2025</div>
+            <div class="arc-ttl">Inflation data shows food prices cooling</div>
+            <div class="arc-sent neut">Neutral</div>
+          </div>
+        </div>
+        <div class="arc-item">
+          <div class="arc-line"><div class="arc-dot"></div><div class="arc-stem"></div></div>
+          <div class="arc-text">
+            <div class="arc-date">Feb 7, 2025</div>
+            <div class="arc-ttl">MPC surprises with 25bps cut; first in 5 years</div>
+            <div class="arc-sent bull">Bullish</div>
+          </div>
+        </div>
+        <div class="arc-item">
+          <div class="arc-line"><div class="arc-dot"></div><div class="arc-stem"></div></div>
+          <div class="arc-text">
+            <div class="arc-date">Dec 2024</div>
+            <div class="arc-ttl">Hawkish commentary dampens market expectations</div>
+            <div class="arc-sent bear">Bearish</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trending -->
+    <div class="widget">
+      <div class="widget-title">Trending Now</div>
+      <div class="trend-item"><span class="trend-num">1</span><div class="trend-body"><div class="trend-title">Union Budget 2025 Capex</div><div class="trend-count">28.4K reads</div></div><span class="trend-arrow">↑</span></div>
+      <div class="trend-item"><span class="trend-num">2</span><div class="trend-body"><div class="trend-title">Zepto Pre-IPO Plans</div><div class="trend-count">19.1K reads</div></div><span class="trend-arrow">↑</span></div>
+      <div class="trend-item"><span class="trend-num">3</span><div class="trend-body"><div class="trend-title">HDFC Bank Q4 Results</div><div class="trend-count">14.7K reads</div></div><span class="trend-arrow">—</span></div>
+      <div class="trend-item"><span class="trend-num">4</span><div class="trend-body"><div class="trend-title">India-China Border Trade</div><div class="trend-count">11.2K reads</div></div><span class="trend-arrow">↑</span></div>
+      <div class="trend-item"><span class="trend-num">5</span><div class="trend-body"><div class="trend-title">SEBI F&O Reforms</div><div class="trend-count">9.8K reads</div></div><span class="trend-arrow">↓</span></div>
+    </div>
+
+  </aside>
+</div>
+
+<!-- AI NAVIGATOR MODAL -->
+<div class="modal-overlay" id="nav-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('nav-modal')">✕</button>
+    <div class="modal-title" id="modal-nav-title">RBI Rate Decision — AI Deep Briefing</div>
+    <div class="modal-sub">⬡ INTERACTIVE INTELLIGENCE BRIEFING · SYNTHESIZED FROM 8 ET ARTICLES</div>
+    <div class="modal-body" id="modal-nav-body">
+      <p><strong>The Decision:</strong> The Reserve Bank of India held the repo rate at 6.5%. The MPC's 4-2 vote reflects a split committee navigating a tricky path between food-driven inflation (5.1%) and slowing private consumption growth.</p>
+      <p><strong>Key Insight:</strong> Governor Das emphasized the "last mile of disinflation" requires patience — a phrase that markets interpreted as rate cuts deferred to H2 2025. Bond markets rallied anyway, pricing in June probability at 64%.</p>
+      <p><strong>Contrarian View:</strong> HSBC and Nomura both see a risk of overtightening. With private capex stalling and rural wages flat in real terms, they argue a cut sooner could reignite consumption without meaningfully reigniting inflation.</p>
+    </div>
+    <div class="follow-qs">
+      <div class="sec-label" style="padding:0;margin-bottom:8px;">Ask a follow-up</div>
+      <div class="follow-q" onclick="askFollowUp('What happens to my home loan EMI?')">What happens to my home loan EMI?</div>
+      <div class="follow-q" onclick="askFollowUp('Which sectors rally on rate hold?')">Which sectors rally on rate hold?</div>
+      <div class="follow-q" onclick="askFollowUp('What is the RBI Governor watching before cutting?')">What is the RBI Governor watching before cutting?</div>
+    </div>
+    <div class="ai-response-area" id="modal-ai-response"></div>
+  </div>
+</div>
+
+<script>
+// ─── PANEL NAVIGATION ───
+const panels = ['home','myet','navigator','video','arc','vernacular'];
+function setPanel(id) {
+  panels.forEach(p => {
+    document.getElementById('panel-'+p)?.classList.remove('active');
+  });
+  document.getElementById('panel-'+id)?.classList.add('active');
+  document.querySelectorAll('.nav-pill').forEach((el,i) => {
+    el.classList.remove('active');
+    if(el.getAttribute('onclick') === `setPanel('${id}')`) el.classList.add('active');
+  });
+  document.querySelectorAll('.side-item').forEach(el => {
+    el.classList.remove('active');
+    if(el.getAttribute('onclick') === `setPanel('${id}')`) el.classList.add('active');
+  });
+}
+
+// ─── FEATURE TABS ───
+document.querySelectorAll('.ftab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+
+// ─── MODALS ───
+function openNavigator(topic) {
+  document.getElementById('nav-modal').classList.add('open');
+  document.getElementById('modal-ai-response').style.display = 'none';
+  document.getElementById('modal-ai-response').innerHTML = '';
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+window.addEventListener('click', e => {
+  if(e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+  }
+});
+
+// ─── FOLLOW-UP AI SIMULATION ───
+const responses = {
+  'What impact does this have on EMI borrowers?': 'For existing floating-rate borrowers, the rate hold means no immediate EMI relief. If you took a ₹50L home loan at 8.75%, your EMI stays ~₹44,000/month. However, economists expect a 25–50bps cumulative cut in H2 2025, which would lower EMIs by ₹800–1,600/month. Consider not prepaying aggressively right now — a cut may arrive soon.',
+  'Which sectors benefit most from the rate hold?': 'Rate-sensitive sectors like banking and real estate had already priced in no change. The real beneficiaries are: (1) NBFCs with high fixed-rate portfolios, (2) Infrastructure plays benefiting from continued capex push, and (3) Pharma & FMCG stocks that gain when growth concerns prevent aggressive hikes.',
+  'When will RBI likely cut rates?': 'Consensus is building around August 2025 MPC meeting as the first cut window — contingent on CPI falling below 4.5% by July. The June 6 meeting is seen as too soon unless Q4 GDP surprises on the downside. Our ET Intelligence Group models show a 68% probability of at least one 25bps cut before December 2025.',
+  'How does this compare to US Fed and ECB stances?': 'Interesting divergence: the US Fed has signaled "higher for longer" through H1 2025, while ECB made its first cut in June 2024. India\'s RBI is broadly aligned with the "wait and watch" camp, but has more room to cut if domestic growth slips — given India\'s lower debt-to-GDP and stronger fiscal position than most EM peers.',
+  'What happens to my home loan EMI?': 'No change in the near term. Your floating rate EMI remains unchanged today. Banks like SBI, HDFC and ICICI have repo-linked lending rates (RLLR) — any repo cut translates directly within 3 months. The ET estimate is ₹600–₹1,200 per ₹10L of home loan outstanding, per 25bps of rate cut.',
+  'Which sectors rally on rate hold?': 'PSU Banks outperformed today (+1.8%) as the stable rate environment protects NIM margins. Auto sector also gained (+1.2%) on expectations that consumer lending rates won\'t rise. Realty stocks were muted — they need an actual cut, not a hold, to see meaningful valuation re-rating.',
+  'What is the RBI Governor watching before cutting?': 'Governor Das has publicly flagged three watchpoints: (1) Durable decline in food inflation below 5%, (2) US Fed pivot — cutting before the Fed risks rupee depreciation pressure, and (3) Monsoon forecast — an El Niño year could reignite food prices. All three need to align for a confident cut.'
+};
+
+function askFollowUp(q) {
+  const area = document.getElementById('ai-response') || document.getElementById('modal-ai-response');
+  area.style.display = 'block';
+  area.classList.add('visible');
+  area.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  setTimeout(() => {
+    const ans = responses[q] || 'Analyzing ET\'s coverage database for context-aware insights on this question...';
+    area.innerHTML = `<div style="color:var(--gold);font-size:11px;font-family:\'IBM Plex Mono\',monospace;margin-bottom:8px;">⬡ AI NAVIGATOR · SYNTHESIZED RESPONSE</div><div style="font-size:13.5px;line-height:1.8;">${ans}</div>`;
+  }, 1200);
+}
+
+// ─── PERSONA SELECTION ───
+function selectPersona(el, name) {
+  document.querySelectorAll('.persona-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('persona-label').textContent = name;
+  const feeds = {
+    'MF Investor': [
+      {img:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=200&q=80',tag:'Mutual Funds',title:'Mirae Asset Flexi Cap Cuts IT Exposure by 8% — CIO Cites Overvaluation in Largecap Tech',meta:'Relevant to your SIP portfolios · 1 hr ago'},
+      {img:'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=200&q=80',tag:'Debt Funds',title:'RBI Rate Hold Boosts Long-Duration Bond Funds — Yield Curve Flattening Signals Opportunity',meta:'NAV impact: Medium-term positive · 2 hr ago'},
+      {img:'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=200&q=80',tag:'Equity',title:'Smallcap Index Correction: 3 Fund Managers Reveal Whether They Are Buying the Dip',meta:'Your smallcap funds may be affected · 3 hr ago'}
+    ],
+    'Startup Founder': [
+      {img:'https://images.unsplash.com/photo-1559526324-593bc073d938?w=200&q=80',tag:'Funding',title:'Zepto Raises $350M at $5B Valuation; Eyes Pre-IPO Round by Q3 2025',meta:'Competitor intel · 1 hr ago'},
+      {img:'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=200&q=80',tag:'Regulation',title:'SEBI Eases SME Listing Norms — Minimum Allottee Threshold Cut to Boost Startup Access',meta:'Policy relevant to your funding journey · 2 hr ago'},
+      {img:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=200&q=80',tag:'Tech',title:'Google, Microsoft Increase India Cloud Investment by ₹2.4L Crore — Opportunity for SaaS Founders',meta:'Market opportunity · 4 hr ago'}
+    ],
+    'Student / Learner': [
+      {img:'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=200&q=80',tag:'Explainer',title:'What is Repo Rate and Why Does the RBI Rate Decision Matter for Your Future?',meta:'Plain-language explainer · 2 hr ago'},
+      {img:'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=200&q=80',tag:'Career',title:'Finance Jobs Hiring Surge in India: 45,000 Openings in BFSI Sector — How to Position Yourself',meta:'Career news · 3 hr ago'},
+      {img:'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=200&q=80',tag:'Basics',title:'Budget 101: What ₹11 Lakh Crore Capex Actually Means and Where the Money Goes',meta:'Beginner-friendly · 5 hr ago'}
+    ],
+    'Corporate Executive': [
+      {img:'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=200&q=80',tag:'M&A',title:'Reliance Retail Eyes 3 Acquisitions in Quick Commerce and D2C Space — Sources',meta:'Strategic intelligence · 1 hr ago'},
+      {img:'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=200&q=80',tag:'Leadership',title:'Infosys CPO Exit: Internal Succession vs External Search — Board Weighs Options',meta:'Leadership moves · 3 hr ago'},
+      {img:'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=200&q=80',tag:'Macro',title:'India Inc CFO Survey: 78% Bullish on FY26 Capex Plans Despite Global Uncertainty',meta:'Macro strategy · 4 hr ago'}
+    ],
+    'Retail Trader': [
+      {img:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=200&q=80',tag:'F&O Alert',title:'Nifty Options: Max Pain at 22,200 — Expect Expiry-Day Range of 22,000–22,500',meta:'This week\'s expiry · 30 min ago'},
+      {img:'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=200&q=80',tag:'Technical',title:'Sensex Breaks 200-DMA Resistance — Chartists Eye 75,000 as Next Target by Month-End',meta:'Price action analysis · 1 hr ago'},
+      {img:'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=200&q=80',tag:'Intraday',title:'HDFC Bank Block Deal Alert: 2.1 Crore Shares Change Hands at ₹1,572 — Buyer Unknown',meta:'Real-time trigger · 2 hr ago'}
+    ],
+    'Policy Watcher': [
+      {img:'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=200&q=80',tag:'Budget',title:'PLI Scheme 2.0 Expands to 12 New Sectors — Full List and Eligibility Criteria',meta:'Policy update · 1 hr ago'},
+      {img:'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=200&q=80',tag:'SEBI',title:'SEBI\'s New Algo Trading Rules: Retail Access Broadens, Risk Guardrails Tighten',meta:'Regulatory change · 3 hr ago'},
+      {img:'https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=200&q=80',tag:'RBI',title:'Digital Lending Norms: RBI Publishes Final Guidelines — Impact on FinTechs and NBFCs',meta:'Regulatory update · 5 hr ago'}
+    ]
+  };
+  const data = feeds[name] || feeds['MF Investor'];
+  document.getElementById('persona-news').innerHTML = data.map(d => `
+    <div class="ln-item">
+      <img class="ln-img" src="${d.img}" alt="">
+      <div class="ln-body">
+        <div class="ln-tag">${d.tag}</div>
+        <div class="ln-title">${d.title}</div>
+        <div class="ln-meta">${d.meta}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ─── VIDEO PLAYER ───
+let playing = false, playTimer = null, prog = 0;
+function togglePlay() {
+  playing = !playing;
+  const btn = document.getElementById('playbtn');
+  btn.textContent = playing ? '⏸' : '▶';
+  if(playing) {
+    playTimer = setInterval(() => {
+      prog = Math.min(prog + 0.7, 100);
+      document.getElementById('vp-bar').style.width = prog + '%';
+      const secs = Math.floor(prog * 0.9);
+      const mins = Math.floor(secs/60);
+      const s = secs % 60;
+      document.getElementById('vp-time').textContent = `${mins}:${s.toString().padStart(2,'0')} / 1:30`;
+      if(prog >= 100) { clearInterval(playTimer); playing = false; btn.textContent = '▶'; prog = 0; }
+    }, 100);
+  } else { clearInterval(playTimer); }
+}
+function loadVideo(el, title, imgUrl) {
+  prog = 0; playing = false;
+  clearInterval(playTimer);
+  document.getElementById('playbtn').textContent = '▶';
+  document.getElementById('vp-bar').style.width = '0%';
+  document.getElementById('video-title').textContent = '▶ ' + title + ' — AI Generated Briefing';
+  document.getElementById('video-thumb').src = imgUrl;
+  const scripts = {
+    'RBI Rate Hold': 'AI Narration: "The RBI\'s monetary policy committee voted to hold the repo rate at 6.5%..."',
+    'Sensex Rally': 'AI Narration: "Foreign institutional investors returned to Indian equities after a six-week gap, driving the Sensex 412 points higher..."'
+  };
+  document.getElementById('vp-script').textContent = scripts[title] || 'AI Narration: generating broadcast script...';
+  document.getElementById('vp-badge').textContent = title === 'Sensex Rally' ? '60s · HD' : '90s · HD';
+}
+function generateNewVideo() {
+  const btn = event.target;
+  btn.textContent = '⚡ Generating... Analysing top story...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '✓ Video Ready — Budget 2025 Explainer (90s)';
+    document.getElementById('video-title').textContent = '▶ Union Budget 2025 Capex Deep Dive — AI Generated';
+    document.getElementById('video-thumb').src = 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?w=700&q=80';
+    document.getElementById('vp-script').textContent = 'AI Narration: "Finance Minister Nirmala Sitharaman unveiled a record ₹11.1 lakh crore capital expenditure outlay..."';
+    document.getElementById('vp-badge').textContent = '90s · HD';
+    prog = 0; document.getElementById('vp-bar').style.width = '0%';
+    btn.disabled = false;
+  }, 2500);
+}
+
+// ─── STORY ARC ───
+function selectArc(el, story) {
+  document.querySelectorAll('.arc-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const arcs = {
+    paytm: {
+      title: '📱 Paytm Banking Crisis — Story Arc',
+      events: [
+        {date:'Jan 31, 2024', e:'RBI bans Paytm Payments Bank from accepting new deposits — stocks crash 40% in two days'},
+        {date:'Feb 2024', e:'Vijay Shekhar Sharma steps down from Paytm Payments Bank board; new CEO appointed'},
+        {date:'Mar 2024', e:'Paytm migrates nodal accounts to Yes Bank & Axis Bank; UPI services largely restored'},
+        {date:'May 2024', e:'Q4 FY24 results: revenue down 36% but fintech services show resilience'},
+        {date:'Dec 2024', e:'Paytm announces strategic pivot to merchant lending and insurance distribution'}
+      ],
+      players: ['Vijay Shekhar Sharma', 'RBI', 'Yes Bank', 'Axis Bank', 'NPCI'],
+      watch: ['Q1 FY26 GMV recovery trajectory', 'RBI compliance audit outcomes', 'Strategic investor entry possibility']
+    },
+    upi: {
+      title: '💳 UPI Global Expansion — Story Arc',
+      events: [
+        {date:'Feb 2023', e:'UPI goes live in Singapore via PayNow linkage — first real-time cross-border payment'},
+        {date:'Jul 2023', e:'France, Mauritius, Nepal, UAE added — G20 summit in India pushes global fast payment agenda'},
+        {date:'Nov 2023', e:'UPI transactions cross 10 billion/month milestone — world\'s largest real-time payment system'},
+        {date:'Feb 2024', e:'NPCI International targets 20 countries by 2025; Sri Lanka and Bahrain onboarded'},
+        {date:'Jan 2025', e:'UPI-PayTo linkage with Australia goes live; NRI remittance use case unlocked'}
+      ],
+      players: ['NPCI International', 'RBI', 'MEA India', 'Visa', 'Mastercard'],
+      watch: ['US market entry negotiations with Federal Reserve', 'China & Pakistan diplomatic barriers', 'UPI-CBDC integration roadmap']
+    }
+  };
+  const d = arcs[story];
+  if(!d) return;
+  document.getElementById('arc-display').innerHTML = `
+    <div class="arc-vis-title">${d.title}</div>
+    <div class="timeline">${d.events.map(ev => `<div class="tl-item"><div class="tl-date">${ev.date}</div><div class="tl-event">${ev.e}</div></div>`).join('')}</div>
+    <div style="margin-top:16px;"><div class="sec-label" style="padding:0;margin-bottom:8px;">Key Players</div>
+    <div class="players-grid">${d.players.map(p => `<div class="player-chip">${p}</div>`).join('')}</div></div>
+    <div class="watchlist"><div class="watchlist-title">👁 What to Watch Next</div>${d.watch.map(w => `<div class="watch-item">${w}</div>`).join('')}</div>
+  `;
+}
+function filterArc(v) { /* live filter logic placeholder */ }
+
+// ─── VERNACULAR ───
+const vernContent = {
+  en: [
+    {tag:'Markets',title:'Sensex Surges 412 Pts as FIIs Return to Indian Equities After 6-Week Gap',meta:'ET Markets · 1 hr ago',img:'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=200&q=80'},
+    {tag:'Policy',title:'RBI Holds Repo Rate at 6.5% — Governor Signals Rate Cut in Second Half of 2025',meta:'ET Economy · 2 hr ago',img:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=200&q=80'},
+    {tag:'Startups',title:'Zepto Raises $350M at $5B Valuation; Eyes Pre-IPO Round by Q3 2025',meta:'ET Startup · 3 hr ago',img:'https://images.unsplash.com/photo-1559526324-593bc073d938?w=200&q=80'}
+  ],
+  hi: [
+    {tag:'बाज़ार',title:'सेंसेक्स 412 अंक उछला — छह सप्ताह बाद विदेशी निवेशकों की वापसी से बाज़ार में उत्साह',meta:'ET बाज़ार · 1 घंटा पहले',img:'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=200&q=80'},
+    {tag:'नीति',title:'RBI ने रेपो रेट 6.5% पर स्थिर रखा — गवर्नर ने 2025 की दूसरी छमाही में कटौती के संकेत दिए',meta:'ET अर्थव्यवस्था · 2 घंटे पहले',img:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=200&q=80'},
+    {tag:'स्टार्टअप',title:'ज़ेप्टो ने ₹2,900 करोड़ जुटाए, $5 अरब का मूल्यांकन — IPO से पहले का दौर Q3 2025 तक',meta:'ET स्टार्टअप · 3 घंटे पहले',img:'https://images.unsplash.com/photo-1559526324-593bc073d938?w=200&q=80'}
+  ],
+  ta: [
+    {tag:'சந்தை',title:'சென்செக்ஸ் 412 புள்ளிகள் உயர்வு — 6 வாரங்களுக்குப் பிறகு வெளிநாட்டு முதலீட்டாளர்கள் திரும்பி வந்தனர்',meta:'ET சந்தை · 1 மணி நேரம் முன்பு',img:'https://images.unsplash.com/photo-1553729459-efe14ef6055d?w=200&q=80'},
+    {tag:'கொள்கை',title:'ரிசர்வ் வங்கி ரெப்போ வட்டி விகிதத்தை 6.5% ஆக நிலையாக வைத்தது — 2025 இரண்டாம் பாதியில் குறைப்பு சாத்தியம்',meta:'ET பொருளாதாரம் · 2 மணி நேரம் முன்பு',img:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=200&q=80'},
+    {tag:'தொடக்கங்கள்',title:'ஜெப்டோ $350 மில்லியன் திரட்டியது — $5 பில்லியன் மதிப்பீட்டில் IPO-க்கு முன் நிதி திட்டம்',meta:'ET தொடக்கங்கள் · 3 மணி நேரம் முன்பு',img:'https://images.unsplash.com/photo-1559526324-593bc073d938?w=200&q=80'}
+  ]
+};
+function setLang(lang, el) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const d = vernContent[lang];
+  document.getElementById('vern-feed').innerHTML = d.map(item => `
+    <div class="ln-item">
+      <img class="ln-img" src="${item.img}" alt="">
+      <div class="ln-body">
+        <div class="ln-tag">${item.tag}</div>
+        <div class="ln-title">${item.title}</div>
+        <div class="ln-meta">${item.meta}</div>
+      </div>
+    </div>
+  `).join('');
+}
+setLang('en', document.querySelector('.lang-btn.active'));
+
+// briefing loader
+function loadBriefing(topic, el) {
+  document.querySelectorAll('#panel-navigator .arc-chip').forEach(c => c.classList.remove('active'));
+  if(typeof el === 'string') {
+    document.querySelectorAll('#panel-navigator .arc-chip')[0].classList.add('active');
+  }
+  const briefings = {
+    budget: {
+      title: '🏛️ Union Budget 2025 — AI Deep Briefing',
+      body: '<p><strong>The Headline Number:</strong> Finance Minister Nirmala Sitharaman announced a ₹11.1 lakh crore capital expenditure outlay — the largest ever in India\'s budget history, representing 3.4% of GDP.</p><p><strong>Key Allocations:</strong> Railways (₹2.55L Cr), Roads & Highways (₹2.78L Cr), Defence Capex (₹1.72L Cr), and a new ₹50,000 Cr Green Hydrogen Mission fund.</p><p><strong>Market Winners:</strong> Infrastructure stocks, capital goods (L&T, Siemens), cement majors (UltraTech, Ambuja), and defence PSUs (HAL, BEL) all saw 3–8% post-budget rallies.</p>'
+    },
+    rbi: {
+      title: '🏦 RBI Rate Decision — AI Deep Briefing',
+      body: '<p><strong>The Decision:</strong> The RBI held the repo rate at 6.5% for the eighth consecutive meeting. The 4-2 vote reflects a committee split on the timing of easing.</p><p><strong>Key Numbers:</strong> CPI inflation at 5.1% (food-driven), Core inflation at 3.4% (decade low), GDP growth projected at 7.2% for FY25.</p><p><strong>What Changed:</strong> RBI\'s tone shifted subtly dovish — "withdrawal of accommodation" stance was retained but Governor Das acknowledged that India is "closer to the turn in the rate cycle."</p>'
+    }
+  };
+  const b = briefings[topic] || briefings['rbi'];
+  document.getElementById('briefing-area').innerHTML = `
+    <div class="arc-vis-title">${b.title}</div>
+    <div class="modal-body">${b.body}</div>
+    <div class="follow-qs">
+      <div class="sec-label" style="padding:0;margin-bottom:8px;">Ask a follow-up question</div>
+      <div class="follow-q" onclick="askFollowUp('What impact does this have on EMI borrowers?')">What impact does this have on EMI borrowers?</div>
+      <div class="follow-q" onclick="askFollowUp('Which sectors benefit most from the rate hold?')">Which sectors benefit most from this?</div>
+      <div class="follow-q" onclick="askFollowUp('When will RBI likely cut rates?')">What happens next?</div>
+    </div>
+    <div class="ai-response-area" id="ai-response"></div>
+  `;
+}
+</script>
+</body>
+</html>

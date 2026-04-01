@@ -1,43 +1,24 @@
-const Parser = require("rss-parser");
-
-const parser = new Parser({
-  customFields: {
-    item: [
-      ["media:content", "mediaContent"],
-      ["content:encoded", "contentEncoded"]
-    ]
-  }
-});
+const axios = require("axios");
+require("dotenv").config();
 
 async function fetchIndiaNews() {
   try {
-    const feed = await parser.parseURL(
-      "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en"
+
+    const response = await axios.get(
+      `https://newsapi.org/v2/everything?q=india&language=en&sortBy=publishedAt&pageSize=20&apiKey=${process.env.NEWS_API_KEY}`
     );
 
-    const articles = feed.items.map(article => {
-      // Extract source from title (Google format: "... - Source")
-      const titleParts = article.title.split(" - ");
-      const source =
-        titleParts.length > 1
-          ? titleParts.pop()
-          : "Unknown";
+    return response.data.articles
+      .filter(article => article.urlToImage) // keep only articles with images
+      .map(article => ({
+        title: article.title,
+        image: article.urlToImage,
+        source: article.source.name,
+        url: article.url
+      }));
 
-      const cleanTitle =
-        titleParts.join(" - ") || article.title;
-
-      return {
-        title: cleanTitle,
-        description: article.contentSnippet || "",
-        source: source,
-        link: article.link,
-        publishedAt: article.pubDate
-      };
-    });
-
-    return articles;
   } catch (err) {
-    console.error("RSS fetch failed:", err.message);
+    console.error("News fetch failed:", err.response?.data || err.message);
     return [];
   }
 }

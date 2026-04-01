@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NEWZON</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<h1>📰 NEWZON Headlines</h1>
+
+<div id="news-container">
+  Loading news...
+</div>
+
+<script>
+fetch("/api/news")
+  .then(res => res.json())
+  .then(data => {
+
+    const container = document.getElementById("news-container");
+    container.innerHTML = "";
+
+    data.forEach(article => {
+
+      const card = document.createElement("div");
+      card.className = "news-card";
+
+      card.innerHTML = `
+        <img src="${article.image ? article.image : 'https://via.placeholder.com/400x200?text=No+Image'}" alt="news image">
+        <h3>${article.title}</h3>
+        <p>${article.source || ''}</p>
+        <a href="${article.url}" target="_blank">Read more</a>
+      `;
+
+      container.appendChild(card);
+
+    });
+
+  })
+  .catch(err => {
+    document.getElementById("news-container").innerHTML =
+      "⚠️ Failed to load news.";
+    console.error(err);
+  });
+</script>
+
+</body>
+</html>
