@@ -2,192 +2,470 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NEWZON Video Speech Summarizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:            #0d1117;
+  --bg2:           #161b22;
+  --card:          #1c2333;
+  --card-hover:    #1f2a3d;
+  --border:        #2a3548;
+  --border-hover:  #3d5080;
+  --accent:        #3b82f6;
+  --accent-dim:    rgba(59,130,246,0.15);
+  --accent-border: rgba(59,130,246,0.35);
+  --accent-hover:  #60a5fa;
+  --text-primary:   #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted:     #484f58;
+  --green:         #22c55e;
+  --green-dim:     rgba(34,197,94,0.12);
+  --green-border:  rgba(34,197,94,0.30);
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+}
 
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-    color: white;
-    text-align: center;
-    padding: 40px;
+  font-family: 'Inter', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 40px 0 80px;
 }
 
-.container {
-    max-width: 800px;
-    margin: auto;
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
-.video-box {
-    background: rgba(255,255,255,0.08);
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 10px;
-}
+.container { max-width: 960px; margin: auto; padding: 0 24px; position: relative; z-index: 1; }
 
-button {
-    background: #ff9800;
-    border: none;
-    padding: 10px 18px;
-    font-size: 15px;
-    border-radius: 6px;
-    cursor: pointer;
+/* ── HEADER ── */
+.header { margin-bottom: 42px; text-align: center; }
+.brand {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 18px;
 }
-
-button:hover {
-    background: #ffa733;
+.brand-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  animation: bpulse 2.4s ease-in-out infinite;
 }
+@keyframes bpulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.25; transform:scale(0.55); }
+}
+.header h1 {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(22px, 3.5vw, 34px);
+  font-weight: 700; color: var(--text-primary);
+  margin-bottom: 10px; line-height: 1.2; letter-spacing: -0.02em;
+}
+.header h1 span { color: var(--accent); }
+.header p { font-size: 15px; color: var(--text-secondary); line-height: 1.65; }
 
+/* ── UPLOAD ZONE ── */
+.upload-zone {
+  background: var(--bg2);
+  border: 1.5px dashed var(--border-hover);
+  border-radius: var(--radius-xl);
+  padding: 22px 26px;
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 36px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.upload-zone:hover { border-color: var(--accent); background: var(--accent-dim); }
+.upload-icon-wrap {
+  width: 46px; height: 46px; border-radius: 12px;
+  background: var(--accent-dim); border: 1px solid var(--accent-border);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.upload-icon-wrap svg { width: 19px; height: 19px; fill: var(--accent); }
+.upload-text-wrap { flex: 1; min-width: 140px; }
+.upload-text-wrap strong { font-size: 14px; font-weight: 500; display: block; margin-bottom: 2px; color: var(--text-primary); }
+.upload-text-wrap span  { font-size: 12px; color: var(--text-muted); }
+#videoInput { display: none; }
+.btn-upload {
+  font-family: 'Inter', sans-serif;
+  padding: 9px 20px; font-size: 13px; font-weight: 600;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: var(--radius-md);
+  cursor: pointer; flex-shrink: 0;
+  transition: background 0.18s, transform 0.13s;
+}
+.btn-upload:hover  { background: var(--accent-hover); transform: translateY(-1px); }
+.btn-upload:active { transform: translateY(0); }
+
+/* ── GLOBAL LOADER + SUMMARY BOX ── */
+#loader { display: none; text-align: center; padding: 24px 0; }
 .spinner {
-    border: 6px solid rgba(255,255,255,0.2);
-    border-top: 6px solid #ff9800;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    margin: 20px auto;
-    animation: spin 1s linear infinite;
+  border: 5px solid var(--border);
+  border-top: 5px solid var(--accent);
+  border-radius: 50%; width: 38px; height: 38px;
+  margin: 0 auto 10px;
+  animation: spin 0.85s linear infinite;
 }
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-#loader {
-    display: none;
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 #summaryBox {
-    display: none;
-    margin-top: 30px;
-    background: rgba(0,0,0,0.3);
-    padding: 20px;
-    border-radius: 10px;
+  display: none;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 28px;
 }
 
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px;
+}
+
+/* ── VIDEO GRID — YouTube-style 2×2 ── */
+#sampleVideos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+@media (max-width: 600px) {
+  #sampleVideos {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── VIDEO CARDS ── */
+.video-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s, background 0.2s;
+}
+.video-box:hover { border-color: var(--border-hover); background: var(--card-hover); }
+
+/* Thumbnail / video area — 16:9 aspect ratio */
+.vb-video-wrap {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.vb-video-wrap video {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #000;
+}
+
+/* Card body below video */
+.vb-body {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.vb-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.vb-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.vb-pill {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+button.btn-summarize {
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s, transform 0.13s;
+}
+button.btn-summarize:hover  { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-1px); }
+button.btn-summarize:active { transform: translateY(0); }
+button.btn-summarize:disabled {
+  background: transparent; color: var(--text-muted);
+  border-color: var(--border); cursor: not-allowed; transform: none;
+}
+
+/* ── LOADER STRIP ── */
+.loader-strip {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.2);
+}
+.loader-stages { display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; }
+.stage-chip {
+  font-size: 10px; padding: 2px 8px; border-radius: 20px;
+  border: 1px solid var(--border); color: var(--text-muted);
+  transition: all 0.26s;
+}
+.stage-chip.active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent-border); }
+.stage-chip.done   { background: var(--green-dim); color: var(--green); border-color: var(--green-border); }
+.progress-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.progress-fill  { height: 100%; width: 0%; background: var(--accent); border-radius: 2px; transition: width 0.13s linear; }
+.loader-pct     { font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 4px; }
+
+/* ── SUMMARY PANEL ── */
+.summary-panel {
+  display: none;
+  border-top: 1px solid var(--border);
+  padding: 12px 14px;
+  background: rgba(59,130,246,0.04);
+  animation: revealDown 0.32s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes revealDown {
+  from { opacity:0; transform:translateY(-5px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.sum-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--green); background: var(--green-dim); border: 1px solid var(--green-border);
+  border-radius: 20px; padding: 3px 10px; margin-bottom: 10px;
+}
+.sum-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); }
+.sum-body { font-size: 12px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 10px; }
+.key-points { display: flex; flex-direction: column; gap: 7px; }
+.kp { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.kp-dot {
+  width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+  background: var(--accent-dim); border: 1px solid var(--accent-border);
+  display: flex; align-items: center; justify-content: center;
+}
+.kp-dot svg { width: 7px; height: 7px; fill: var(--accent); }
 </style>
 </head>
 
-
 <body>
-
 <div class="container">
 
-<h1>🎬 NEWZON Speech Video Summarizer</h1>
+  <!-- Header -->
+  <div class="header">
+    <div class="brand"><div class="brand-dot"></div> NEWZON Platform</div>
+    <h1>🎬 NEWZON Speech Video <span>Summarizer</span></h1>
+    <p>Upload a video OR summarize one of the sample speeches below.</p>
+  </div>
 
-<p>Upload a video OR summarize one of the sample speeches below.</p>
+  <!-- Upload Section -->
+  <div class="upload-zone" onclick="document.getElementById('videoInput').click()">
+    <div class="upload-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M12 3a1 1 0 01.707.293l4 4a1 1 0 01-1.414 1.414L13 6.414V15a1 1 0 11-2 0V6.414L8.707 8.707A1 1 0 017.293 7.293l4-4A1 1 0 0112 3zM4 17a1 1 0 011-1h14a1 1 0 110 2H5a1 1 0 01-1-1z"/></svg>
+    </div>
+    <div class="upload-text-wrap">
+      <strong>Upload your own video</strong>
+      <span>MP4 supported — click anywhere to browse</span>
+    </div>
+    <button class="btn-upload" onclick="event.stopPropagation(); uploadVideo()">Summarize Uploaded Video</button>
+    <input type="file" id="videoInput" accept="video/mp4">
+  </div>
 
-
-<!-- Upload section -->
-
-<input type="file" id="videoInput" accept="video/mp4">
-<br><br>
-
-<button onclick="uploadVideo()">Summarize Uploaded Video</button>
-
-
-<!-- Sample videos -->
-
-<div class="video-box">
-    <h3>Sample Speech 1</h3>
-    <video width="400" controls>
-        <source src="/videos/sample1.mp4" type="video/mp4">
-    </video>
-    <br><br>
-    <button onclick="summarizeExisting('videos/sample1.mp4')">
-        Summarize This Video
-    </button>
-</div>
-
-
-<div class="video-box">
-    <h3>Sample Speech 2</h3>
-    <video width="400" controls>
-        <source src="/videos/sample2.mp4" type="video/mp4">
-    </video>
-    <br><br>
-    <button onclick="summarizeExisting('videos/sample2.mp4')">
-        Summarize This Video
-    </button>
-</div>
-
-
-<!-- Loader -->
-
-<div id="loader">
-    <p>Processing video... please wait ⏳</p>
+  <!-- original #loader + .spinner -->
+  <div id="loader">
+    <p style="font-size:14px;color:var(--text-secondary);margin-bottom:10px;">Processing video... please wait ⏳</p>
     <div class="spinner"></div>
+  </div>
+
+  <!-- original #summaryBox + #summaryText -->
+  <div id="summaryBox">
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text-primary);">📄 Summary</h3>
+    <p id="summaryText" style="font-size:14px;color:var(--text-secondary);line-height:1.75;"></p>
+  </div>
+
+  <div class="section-label">Sample speeches</div>
+
+  <!-- original id="sampleVideos" -->
+  <div id="sampleVideos"></div>
+
 </div>
-
-
-<!-- Summary output -->
-
-<div id="summaryBox">
-    <h3>📄 Summary</h3>
-    <p id="summaryText"></p>
-</div>
-
-</div>
-
 
 <script>
+// LIST OF SAMPLE VIDEOS
+const sampleList = [
+  { title: "Sample Speech 1", file: "videos/sample1.mp4" },
+  { title: "Sample Speech 2", file: "videos/sample2.mp4" },
+  { title: "Sample Speech 3", file: "videos/sample3.mp4" },
+  { title: "Sample Speech 4", file: "videos/sample4.mp4" },
+];
 
+const speechMeta = [
+  { topic: "Communication",    duration: "4:32" },
+  { topic: "Leadership",       duration: "6:14" },
+  { topic: "Entrepreneurship", duration: "5:08" },
+  { topic: "Management",       duration: "7:23" },
+];
+
+// AUTO-GENERATE VIDEO SECTIONS
+const container = document.getElementById("sampleVideos");
+
+sampleList.forEach((video, i) => {
+  const meta = speechMeta[i] || { topic: "", duration: "" };
+
+  container.insertAdjacentHTML("beforeend", `
+    <div class="video-box" id="card-${i}">
+
+      <div class="vb-video-wrap">
+        <video controls preload="metadata">
+          <source src="/${video.file}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <div class="vb-body">
+        <div>
+          <div class="vb-title">${video.title}</div>
+          <div class="vb-meta" style="margin-top:5px;">
+            <span class="vb-pill">${meta.topic}</span>
+            <span>${meta.duration}</span>
+          </div>
+        </div>
+        <button class="btn-summarize" id="btn-${i}" onclick="summarizeExisting('${video.file}', ${i})">
+          Summarize This Video
+        </button>
+      </div>
+
+      <div class="loader-strip" id="ls-${i}">
+        <div class="loader-stages">
+          <div class="stage-chip" id="chip-${i}-0">Extracting audio</div>
+          <div class="stage-chip" id="chip-${i}-1">Transcribing speech</div>
+          <div class="stage-chip" id="chip-${i}-2">Generating summary</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="bar-${i}"></div></div>
+        <div class="loader-pct" id="pct-${i}">0%</div>
+      </div>
+
+      <div class="summary-panel" id="sp-${i}">
+        <div class="sum-badge">AI Summary · NEWZON Engine</div>
+        <div class="sum-body" id="sb-${i}"></div>
+        <div class="key-points" id="skp-${i}"></div>
+      </div>
+
+    </div>
+  `);
+});
+
+
+// SUMMARIZE EXISTING VIDEO — calls real backend
+async function summarizeExisting(filename, i) {
+  const btn   = document.getElementById("btn-"+i);
+  const strip = document.getElementById("ls-"+i);
+  const bar   = document.getElementById("bar-"+i);
+  const pctEl = document.getElementById("pct-"+i);
+  const panel = document.getElementById("sp-"+i);
+  const chips = [0,1,2].map(n => document.getElementById(`chip-${i}-${n}`));
+
+  btn.disabled = true;
+  btn.textContent = "Processing…";
+  strip.style.display = "block";
+  panel.style.display = "none";
+
+  bar.style.width = "0%";
+  pctEl.textContent = "0%";
+  chips.forEach(c => c.className = "stage-chip");
+  chips[0].classList.add("active");
+
+  let pct = 0, stage = 0;
+
+  const progress = setInterval(() => {
+    pct = Math.min(95, pct + Math.random() * 6 + 3);
+    bar.style.width = pct + "%";
+    pctEl.textContent = Math.round(pct) + "%";
+    if (pct >= 33 && stage === 0) { chips[0].classList.replace("active","done"); chips[1].classList.add("active"); stage=1; }
+    if (pct >= 68 && stage === 1) { chips[1].classList.replace("active","done"); chips[2].classList.add("active"); stage=2; }
+  }, 120);
+
+  // SEND REQUEST TO BACKEND
+  const formData = new FormData();
+  formData.append("existing_video", filename);
+
+  const response = await fetch("/summarize", {
+    method: "POST",
+    body: formData
+  });
+
+  const data = await response.json();
+
+  clearInterval(progress);
+  chips[2].classList.replace("active","done");
+  bar.style.width = "100%";
+  pctEl.textContent = "100%";
+
+  setTimeout(() => {
+    strip.style.display = "none";
+    document.getElementById("sb-"+i).textContent =
+      data.summary || data.message || "Summary not available.";
+    document.getElementById("skp-"+i).innerHTML = "";
+    panel.style.display = "block";
+    btn.disabled = false;
+    btn.textContent = "Summarize This Video";
+  }, 300);
+}
+
+
+// UPLOAD VIDEO FUNCTION
 async function uploadVideo() {
+  const file = document.getElementById("videoInput").files[0];
+  if (!file) { alert("Upload a video first."); return; }
 
-    const file = document.getElementById("videoInput").files[0];
+  const formData = new FormData();
+  formData.append("video", file);
 
-    if (!file) {
-        alert("Upload a video first.");
-        return;
-    }
+  document.getElementById("loader").style.display = "block";
+  document.getElementById("summaryBox").style.display = "none";
 
-    sendVideo(file);
+  const response = await fetch("/summarize", {
+    method: "POST",
+    body: formData
+  });
 
+  const data = await response.json();
+
+  document.getElementById("loader").style.display = "none";
+  document.getElementById("summaryBox").style.display = "block";
+  document.getElementById("summaryText").innerText =
+    data.summary || data.message || "Summary not returned.";
 }
-
-
-async function summarizeExisting(filename) {
-
-    const formData = new FormData();
-    formData.append("existing_video", filename);
-
-    processRequest(formData);
-
-}
-
-
-async function sendVideo(file) {
-
-    const formData = new FormData();
-    formData.append("video", file);
-
-    processRequest(formData);
-
-}
-
-
-async function processRequest(formData) {
-
-    document.getElementById("loader").style.display = "block";
-    document.getElementById("summaryBox").style.display = "none";
-
-    const response = await fetch("/summarize", {
-        method: "POST",
-        body: formData
-    });
-
-    const data = await response.json();
-
-    document.getElementById("loader").style.display = "none";
-    document.getElementById("summaryBox").style.display = "block";
-
-    document.getElementById("summaryText").innerText =
-    data.summary || data.error || "Summary not returned.";
-
-}
-
 </script>
-
 </body>
 </html>
