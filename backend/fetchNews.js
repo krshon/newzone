@@ -4,7 +4,7 @@ require("dotenv").config();
 async function fetchIndiaNews() {
   try {
     const response = await axios.get(
-      `https://newsapi.org/v2/everything?q=india&language=en&sortBy=publishedAt&pageSize=30&apiKey=${process.env.NEWS_API_KEY}`
+      `https://newsapi.org/v2/everything?q=india&language=en&sortBy=publishedAt&pageSize=50&apiKey=${process.env.NEWS_API_KEY}`
     );
 
     const formattedNews = response.data.articles

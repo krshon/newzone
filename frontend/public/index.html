@@ -1,47 +1,276 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NEWZON</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
 
-<h1>📰 NEWZON Headlines</h1>
+  <!-- NAV -->
+  <nav class="nz-nav">
+    <div class="nz-logo">
+      <div class="nz-logo-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="10" stroke="#22c55e" stroke-width="1.5"/>
+          <path d="M6 15L10 8L13 12L15.5 9" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="15.5" cy="9" r="1.5" fill="#22c55e"/>
+        </svg>
+      </div>
+      <span class="nz-logo-text">NEWZON</span>
+    </div>
+    <div class="nz-nav-pills">
+      <button class="nz-pill active" data-filter="all">All</button>
+      <button class="nz-pill" data-filter="Politics">Politics</button>
+      <button class="nz-pill" data-filter="Tech">Tech</button>
+      <button class="nz-pill" data-filter="World">World</button>
+      <button class="nz-pill" data-filter="Business">Business</button>
+    </div>
+    <div class="nz-live">
+      <div class="nz-live-dot"></div>
+      Live feed
+    </div>
+  </nav>
 
-<div id="news-container">
-  Loading news...
-</div>
+  <!-- LAYOUT -->
+  <div class="nz-layout">
+
+    <!-- MAIN FEED -->
+    <div class="nz-main">
+      <div class="nz-page-title">Today's Stories</div>
+      <div id="news-container">
+        <div class="nz-skeleton-cluster">
+          <div class="nz-skeleton nz-skel-heading"></div>
+          <div class="nz-grid">
+            <div class="nz-skeleton nz-skel-card"></div>
+            <div class="nz-skeleton nz-skel-card"></div>
+            <div class="nz-skeleton nz-skel-card"></div>
+            <div class="nz-skeleton nz-skel-card"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="nz-sidebar">
+
+      <!-- STOCKS -->
+      <div class="sb-panel">
+        <div class="sb-panel-header">
+          <span class="sb-panel-title">Markets</span>
+          <span class="sb-live-badge">LIVE</span>
+        </div>
+        <div id="sb-stocks"></div>
+      </div>
+
+      <!-- DIVIDER -->
+      <div class="sb-divider"></div>
+
+      <!-- TWEETS -->
+      <div class="sb-panel sb-panel-tweets">
+        <div class="sb-panel-header">
+          <span class="sb-panel-title">Trending on X</span>
+          <span class="sb-x-dot">𝕏</span>
+        </div>
+        <div class="sb-tweets" id="sb-tweets"></div>
+      </div>
+
+    </aside>
+  </div>
 
 <script>
+/* ── STOCKS (5 only) ─────────────────────────── */
+const STOCKS = [
+  { sym: "AAPL",  name: "Apple",    price: 213.49, change: +1.24 },
+  { sym: "NVDA",  name: "Nvidia",   price: 878.35, change: +12.4 },
+  { sym: "TSLA",  name: "Tesla",    price: 172.82, change: -3.11 },
+  { sym: "BTC",   name: "Bitcoin",  price: 67420,  change: +840  },
+  { sym: "MSFT",  name: "Microsoft",price: 415.32, change: +2.05 },
+];
+
+function fmtPrice(p) {
+  return "$" + p.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function buildSidebarStocks() {
+  const el = document.getElementById("sb-stocks");
+  el.innerHTML = STOCKS.map(s => {
+    const up = s.change >= 0;
+    return `<div class="sb-stock-row" id="row-${s.sym}">
+      <div class="sb-stock-left">
+        <span class="sb-stock-sym">${s.sym}</span>
+        <span class="sb-stock-name">${s.name}</span>
+      </div>
+      <div class="sb-stock-right">
+        <span class="sb-stock-price" id="price-${s.sym}">${fmtPrice(s.price)}</span>
+        <span class="sb-stock-chg ${up ? "sb-up" : "sb-dn"}" id="chg-${s.sym}">${up ? "▲" : "▼"} ${Math.abs(s.change).toFixed(2)}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function simulateTicks() {
+  STOCKS.forEach(s => {
+    const drift = (Math.random() - 0.488) * s.price * 0.003;
+    s.price = Math.max(0.01, s.price + drift);
+    s.change += drift;
+    const up = s.change >= 0;
+    const pe = document.getElementById("price-" + s.sym);
+    const ce = document.getElementById("chg-"   + s.sym);
+    if (!pe) return;
+    pe.textContent = fmtPrice(s.price);
+    pe.classList.remove("flash-up","flash-dn");
+    void pe.offsetWidth;
+    pe.classList.add(drift >= 0 ? "flash-up" : "flash-dn");
+    ce.textContent = (up ? "▲ " : "▼ ") + Math.abs(s.change).toFixed(2);
+    ce.className = "sb-stock-chg " + (up ? "sb-up" : "sb-dn");
+  });
+}
+
+buildSidebarStocks();
+setInterval(simulateTicks, 3000);
+
+/* ── TWEETS (10 — more than before) ─────────── */
+const TWEETS = [
+  { handle:"@elonmusk",   avatar:"E", time:"1m ago",  text:"The thing I find most surprising is how few people are paying attention to what's happening in real time." },
+  { handle:"@POTUS",      avatar:"P", time:"6m ago",  text:"Our economy added 275,000 jobs last month. That's Bidenomics in action — and we're just getting started." },
+  { handle:"@Reuters",    avatar:"R", time:"11m ago", text:"BREAKING: G7 leaders agree on new framework for AI governance ahead of summit in Rome." },
+  { handle:"@sama",       avatar:"S", time:"18m ago", text:"AGI is closer than most people think. We should be having serious conversations about what that actually means for everyone." },
+  { handle:"@nytimes",    avatar:"N", time:"24m ago", text:"The Fed's decision today sent mixed signals to markets still uncertain about the path of rates through the rest of the year." },
+  { handle:"@BBCBreaking",avatar:"B", time:"33m ago", text:"Negotiations resume in Geneva as both sides signal cautious optimism over a possible ceasefire agreement." },
+  { handle:"@WSJ",        avatar:"W", time:"41m ago", text:"Tech stocks surge as investors rotate back into growth names on falling Treasury yields." },
+  { handle:"@NASA",       avatar:"N", time:"52m ago", text:"Artemis II crew announced. Four astronauts set to fly around the Moon — the first humans to do so in over 50 years." },
+  { handle:"@IMFNews",    avatar:"I", time:"1h ago",  text:"Global growth forecast revised upward to 3.2% for 2025, driven by stronger-than-expected emerging market performance." },
+  { handle:"@guardian",   avatar:"G", time:"1h ago",  text:"Scientists confirm a sixth mass extinction event is underway, with vertebrate species disappearing at 100× the natural rate." },
+];
+
+function buildTweets() {
+  const el = document.getElementById("sb-tweets");
+  el.innerHTML = TWEETS.map(t => tweetHTML(t)).join("");
+}
+
+function tweetHTML(t) {
+  return `<div class="sb-tweet">
+    <div class="sb-tweet-top">
+      <div class="sb-avatar">${t.avatar}</div>
+      <div class="sb-tweet-meta">
+        <span class="sb-handle">${t.handle}</span>
+        <span class="sb-time">${t.time}</span>
+      </div>
+    </div>
+    <p class="sb-tweet-text">${t.text}</p>
+  </div>`;
+}
+
+buildTweets();
+
+let tweetIdx = 0;
+setInterval(() => {
+  tweetIdx = (tweetIdx + 1) % TWEETS.length;
+  const el = document.getElementById("sb-tweets");
+  const inner = document.createElement("div");
+  inner.className = "sb-tweet sb-tweet-new";
+  inner.innerHTML = `<div class="sb-tweet-top"><div class="sb-avatar">${TWEETS[tweetIdx].avatar}</div><div class="sb-tweet-meta"><span class="sb-handle">${TWEETS[tweetIdx].handle}</span><span class="sb-time">just now</span></div></div><p class="sb-tweet-text">${TWEETS[tweetIdx].text}</p>`;
+  el.prepend(inner);
+  setTimeout(() => inner.classList.add("sb-tweet-visible"), 20);
+  while (el.children.length > 12) el.removeChild(el.lastChild);
+}, 10000);
+
+/* ── NEWS FEED ───────────────────────────────── */
 fetch("/api/news")
   .then(res => res.json())
   .then(data => {
-
     const container = document.getElementById("news-container");
     container.innerHTML = "";
 
+    const clusters = {};
     data.forEach(article => {
-
-      const card = document.createElement("div");
-      card.className = "news-card";
-
-      card.innerHTML = `
-        <img src="${article.image ? article.image : 'https://via.placeholder.com/400x200?text=No+Image'}" alt="news image">
-        <h3>${article.title}</h3>
-        <p class="desc">${article.description || "Click to read full article..."}</p>
-        <p class="source">${article.source || ''}</p>
-        <a href="${article.url}" target="_blank">Read more</a>
-      `;
-
-      container.appendChild(card);
-
+      const clusterId = article.cluster_id ?? "misc";
+      if (!clusters[clusterId]) clusters[clusterId] = [];
+      clusters[clusterId].push(article);
     });
 
+    const sortedClusterIds = Object.keys(clusters)
+      .filter(id => clusters[id].length > 0)
+      .sort((a, b) => clusters[b].length - clusters[a].length);
+
+    sortedClusterIds.forEach(clusterId => {
+      const clusterArticles = clusters[clusterId];
+      const clusterTitle = clusterArticles[0].title.split(":")[0];
+
+      const clusterSection = document.createElement("div");
+      clusterSection.className = "nz-cluster";
+      // data-count drives the flex-basis so small clusters don't balloon
+      clusterSection.setAttribute("data-count", Math.min(clusterArticles.length, 3));
+      clusterSection.innerHTML = `
+        <div class="nz-cluster-header">
+          <div class="nz-cluster-accent"></div>
+          <div class="nz-cluster-title">${clusterTitle}</div>
+          <div class="nz-cluster-badge">${clusterArticles.length} source${clusterArticles.length > 1 ? "s" : ""}</div>
+        </div>
+        <div class="nz-grid"></div>`;
+
+      const grid = clusterSection.querySelector(".nz-grid");
+
+      clusterArticles.forEach(article => {
+        const card = document.createElement("div");
+        card.className = "news-card";
+        const scores = article.bias_scores || { left:0, center:0, right:0 };
+        const lw = scores.left   * 100;
+        const cw = scores.center * 100;
+        const rw = scores.right  * 100;
+        const category = article.category || "General";
+        card.innerHTML = `
+          <img src="${article.image || ''}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""/>
+          <div class="nz-img-fallback" style="display:none"><span>${article.source ? article.source[0] : "N"}</span></div>
+          <div class="nz-card-body">
+            <div class="nz-card-meta">
+              <span class="nz-source">${article.source || ""}</span>
+              <span class="nz-category">${category}</span>
+            </div>
+            <h3>${article.title}</h3>
+            <p class="nz-desc">${article.description || ""}</p>
+            <div class="nz-card-footer">
+              <div class="bias-bar">
+                <div class="bias-left"   style="width:${lw}%"></div>
+                <div class="bias-center" style="width:${cw}%"></div>
+                <div class="bias-right"  style="width:${rw}%"></div>
+              </div>
+              <div class="bias-labels">
+                <span><span class="bl-dot" style="background:#3b82f6"></span>L ${Math.round(lw)}%</span>
+                <span><span class="bl-dot" style="background:#6b7280"></span>C ${Math.round(cw)}%</span>
+                <span><span class="bl-dot" style="background:#f97316"></span>R ${Math.round(rw)}%</span>
+              </div>
+              <a class="nz-card-link" href="${article.url}" target="_blank" rel="noopener">Read more →</a>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+
+      container.appendChild(clusterSection);
+    });
+
+    document.querySelectorAll(".nz-pill").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".nz-pill").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const filter = btn.dataset.filter;
+        document.querySelectorAll(".news-card").forEach(card => {
+          const cat = card.querySelector(".nz-category")?.textContent?.trim() || "";
+          card.style.display = (filter === "all" || cat === filter) ? "" : "none";
+        });
+        document.querySelectorAll(".nz-cluster").forEach(cluster => {
+          const visible = [...cluster.querySelectorAll(".news-card")].some(c => c.style.display !== "none");
+          cluster.style.display = visible ? "" : "none";
+        });
+      });
+    });
   })
   .catch(err => {
     document.getElementById("news-container").innerHTML =
-      "⚠️ Failed to load news.";
+      `<div class="nz-error">⚠️ Failed to load news. Please try again.</div>`;
     console.error(err);
   });
 </script>

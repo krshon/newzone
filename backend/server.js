@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const axios = require("axios");
 
 const fetchIndiaNews = require("./fetchNews");
 
@@ -13,20 +14,18 @@ app.get("/api/news", async (req, res) => {
 
     const articles = await fetchIndiaNews();
 
-    const cleaned = articles.map(article => ({
-      title: article.title,
-      description: article.description, // ✅ now sent to frontend
-      image: article.image,
-      source: article.source,
-      url: article.url
-    }));
+    // Send articles to FastAPI analyzer
+    const analysis = await axios.post(
+      "http://127.0.0.1:8000/analyze-news",
+      { articles }
+    );
 
-    res.json(cleaned);
+    res.json(analysis.data.articles);
 
   } catch (err) {
 
-    console.error(err);
-    res.status(500).send("Failed to fetch news");
+    console.error(err.message);
+    res.status(500).send("Failed to fetch analyzed news");
 
   }
 });
