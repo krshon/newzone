@@ -1,0 +1,295 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  color: #4fc3f7;
+  margin-bottom: 20px;
+  font-size: 2.5rem;
+}
+
+.match-info {
+  background-color: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+.teams {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.team-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+.vs {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ccc;
+}
+
+.csk h2 {
+  color: #f9cd05;
+  text-shadow: 1px 1px 1px #000;
+}
+
+.gt h2 {
+  color: #4fc3f7;
+}
+
+.match-details {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #333;
+  padding-top: 15px;
+}
+
+#match-status {
+  color: #ff6b6b;
+  font-weight: bold;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+main {
+  margin-bottom: 30px;
+}
+
+.score-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.score-card {
+  flex: 1;
+  min-width: 300px;
+  background-color: #1f1f1f;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+.score-card h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #333;
+  color: #ffffff;
+}
+
+.current-score {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.overs {
+  font-size: 1rem;
+  color: #bbbbbb;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #fff;
+}
+
+table th, table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #333;
+}
+
+table th {
+  background-color: #2a2a2a;
+  font-weight: 600;
+}
+
+.match-summary {
+  background-color: #1f1f1f;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+}
+
+.match-summary h3 {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #333;
+  color: #ffffff;
+}
+
+.commentary {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.commentary-item {
+  padding: 10px;
+  border-bottom: 1px solid #333;
+}
+
+.commentary-item .over {
+  font-weight: bold;
+  color: #4fc3f7;
+}
+
+.commentary-item .text {
+  margin-top: 5px;
+}
+
+.ball-4 {
+  background-color: #66bb6a;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.ball-6 {
+  background-color: #42a5f5;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+.ball-W {
+  background-color: #ef5350;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-right: 5px;
+}
+
+footer {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  color: #999;
+}
+
+.controls {
+  margin-bottom: 15px;
+}
+
+button {
+  background-color: #4fc3f7;
+  color: #000;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #03a9f4;
+}
+
+select {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  background-color: #1f1f1f;
+  color: #fff;
+  margin-left: 10px;
+}
+
+@media (max-width: 768px) {
+  .match-details {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .score-container {
+    flex-direction: column;
+  }
+
+  .current-score {
+    font-size: 1.5rem;
+  }
+
+  .team-logo {
+    width: 60px;
+    height: 60px;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+}
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1e1e1e;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05);
+}
+
+.home-btn {
+  text-decoration: none;
+  color: #ffffff;
+  background-color: #4fc3f7;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.home-btn:hover {
+  background-color: #03a9f4;
+}
+
+.nav-right select {
+  background-color: #2a2a2a;
+  color: #fff;
+  border: 1px solid #444;
+  padding: 8px;
+  border-radius: 5px;
+}

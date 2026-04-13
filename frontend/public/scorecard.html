@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSK vs GT - Live Scorecard | Criczet</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #121212;
+      color: #ffffff;
+    }
+
+    .top-header {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .top-header .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #4fc3f7;
+      text-decoration: none;
+    }
+
+    .back-btn {
+      background-color: rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .back-btn:hover {
+      background-color: rgba(255,255,255,0.2);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .match-header {
+      background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.05);
+    }
+
+    .live-badge {
+      display: inline-block;
+      background-color: #ff6b6b;
+      color: white;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      animation: pulse 2s infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .match-title {
+      font-size: 1.3rem;
+      color: #4fc3f7;
+      margin-bottom: 15px;
+    }
+
+    .score-summary {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 20px;
+      align-items: center;
+      margin: 20px 0;
+    }
+
+    .team-score-box {
+      text-align: center;
+    }
+
+    .team-score-box.batting {
+      background-color: rgba(79, 195, 247, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      border: 2px solid #4fc3f7;
+    }
+
+    .team-name-large {
+      font-size: 1.8rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .score-large {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #4fc3f7;
+    }
+
+    .overs-info {
+      color: #999;
+      margin-top: 5px;
+    }
+
+    .vs-divider {
+      font-size: 1.5rem;
+      color: #666;
+    }
+
+    .match-status-info {
+      text-align: center;
+      padding: 15px;
+      background-color: rgba(102, 187, 106, 0.2);
+      border-radius: 10px;
+      margin-top: 15px;
+      border: 1px solid #66bb6a;
+    }
+
+    .status-text {
+      font-size: 1.2rem;
+      color: #66bb6a;
+      font-weight: 600;
+    }
+
+    .venue-info {
+      text-align: center;
+      color: #999;
+      margin-top: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #333;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: #bbbbbb;
+      padding: 15px 25px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: #4fc3f7;
+    }
+
+    .tab-btn.active {
+      color: #4fc3f7;
+      border-bottom-color: #4fc3f7;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .scorecard-section {
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+
+    .innings-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #333;
+    }
+
+    .innings-title {
+      font-size: 1.5rem;
+      color: #4fc3f7;
+    }
+
+    .innings-score {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #4fc3f7;
+    }
+
+    .batting-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    .batting-table thead {
+      background-color: #2a2a2a;
+    }
+
+    .batting-table th {
+      padding: 12px;
+      text-align: left;
+      color: #4fc3f7;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .batting-table th:last-child,
+    .batting-table td:last-child {
+      text-align: center;
+    }
+
+    .batting-table td {
+      padding: 12px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .batting-table tr:hover {
+      background-color: rgba(79, 195, 247, 0.05);
+    }
+
+    .batsman-name {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .batting-tag {
+      display: inline-block;
+      background-color: #ff6b6b;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      margin-left: 8px;
+    }
+
+    .dismissal-info {
+      color: #999;
+      font-size: 0.85rem;
+    }
+
+    .bowling-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .bowling-table thead {
+      background-color: #2a2a2a;
+    }
+
+    .bowling-table th {
+      padding: 12px;
+      text-align: left;
+      color: #4fc3f7;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .bowling-table td {
+      padding: 12px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .bowling-table tr:hover {
+      background-color: rgba(79, 195, 247, 0.05);
+    }
+
+    .commentary-section {
+      background-color: #1f1f1f;
+      border-radius: 12px;
+      padding: 25px;
+    }
+
+    .commentary-header {
+      font-size: 1.5rem;
+      color: #4fc3f7;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #333;
+    }
+
+    .over-group {
+      margin-bottom: 30px;
+    }
+
+    .over-header {
+      background-color: #2a2a2a;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-weight: 600;
+      color: #4fc3f7;
+    }
+
+    .commentary-ball {
+      padding: 15px;
+      margin-bottom: 10px;
+      background-color: #252525;
+      border-radius: 8px;
+      border-left: 4px solid #4fc3f7;
+      transition: all 0.3s;
+    }
+
+    .commentary-ball:hover {
+      background-color: #2a2a2a;
+      transform: translateX(5px);
+    }
+
+    .commentary-ball.wicket {
+      border-left-color: #ff6b6b;
+      background-color: rgba(255, 107, 107, 0.1);
+    }
+
+    .commentary-ball.boundary {
+      border-left-color: #66bb6a;
+      background-color: rgba(102, 187, 106, 0.1);
+    }
+
+    .ball-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .ball-number {
+      font-weight: 600;
+      color: #4fc3f7;
+    }
+
+    .ball-runs {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 50%;
+      font-weight: bold;
+      min-width: 35px;
+      text-align: center;
+    }
+
+    .ball-runs.dot {
+      background-color: #2a2a2a;
+      color: #999;
+    }
+
+    .ball-runs.single {
+      background-color: #4fc3f7;
+      color: #000;
+    }
+
+    .ball-runs.boundary {
+      background-color: #66bb6a;
+      color: #000;
+    }
+
+    .ball-runs.six {
+      background-color: #9c27b0;
+      color: #fff;
+    }
+
+    .ball-runs.wicket {
+      background-color: #ff6b6b;
+      color: #fff;
+    }
+
+    .commentary-text {
+      color: #ccc;
+      line-height: 1.6;
+    }
+
+    .partnership-info {
+      background-color: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+
+    .partnership-stat {
+      flex: 1;
+    }
+
+    .partnership-label {
+      color: #999;
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+    }
+
+    .partnership-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #4fc3f7;
+    }
+
+    .fall-of-wickets {
+      background-color: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .fow-title {
+      color: #4fc3f7;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .fow-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .fow-item {
+      color: #ccc;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      .score-summary {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .vs-divider {
+        display: none;
+      }
+
+      .batting-table, .bowling-table {
+        font-size: 0.85rem;
+      }
+
+      .batting-table th, .batting-table td,
+      .bowling-table th, .bowling-table td {
+        padding: 8px 5px;
+      }
+
+      .tabs {
+        font-size: 0.9rem;
+      }
+
+      .tab-btn {
+        padding: 12px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="container">
+      <a href="#" class="logo">🏏 CRICJET</a>
+      <a href="sports.html" class="back-btn">← Back to Home</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Match Header -->
+    <div class="match-header">
+      <span class="live-badge">● LIVE</span>
+      <div class="match-title">IPL 2026</div>
+      
+      <div class="score-summary">
+        <div class="team-score-box">
+          <div class="team-name-large">Chennai Super Kings</div>
+          <div class="score-large">187/4</div>
+          <div class="overs-info">(20.0 overs)</div>
+        </div>
+        
+        <div class="vs-divider">vs</div>
+        
+        <div class="team-score-box batting">
+          <div class="team-name-large">Gujarat Titans</div>
+          <div class="score-large">156/8</div>
+          <div class="overs-info">(18.2 overs)</div>
+        </div>
+      </div>
+
+      <div class="match-status-info">
+        <div class="status-text">Gujarat Titans need 32 runs from 10 balls</div>
+      </div>
+
+      <div class="venue-info">
+        📍 M.A. Chidambaram Stadium, Chennai • Toss: CSK opted to bat
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('commentary')">Commentary</button>
+      <button class="tab-btn" onclick="switchTab('scorecard')">Scorecard</button>
+      <button class="tab-btn" onclick="switchTab('partnerships')">Partnerships</button>
+      <button class="tab-btn" onclick="switchTab('stats')">Match Stats</button>
+    </div>
+
+    <!-- Commentary Tab -->
+    <div id="commentary" class="tab-content active">
+      <div class="commentary-section">
+        <h2 class="commentary-header">Live Ball-by-Ball Commentary</h2>
+        
+        <div class="partnership-info">
+          <div class="partnership-stat">
+            <div class="partnership-label">Current Partnership</div>
+            <div class="partnership-value">45(23)</div>
+          </div>
+          <div class="partnership-stat">
+            <div class="partnership-label">Required Rate</div>
+            <div class="partnership-value">19.20</div>
+          </div>
+          <div class="partnership-stat">
+            <div class="partnership-label">Current Rate</div>
+            <div class="partnership-value">8.51</div>
+          </div>
+        </div>
+
+        <div class="over-group">
+          <div class="over-header">Over 18.2 • 9 runs • M Pathirana bowling</div>
+          
+          <div class="commentary-ball wicket">
+            <div class="ball-info">
+              <span class="ball-number">18.2</span>
+              <span class="ball-runs wicket">W</span>
+            </div>
+            <div class="commentary-text">
+              <strong>OUT! BOWLED!</strong> Pathirana gets his third! A perfect yorker at 145 kph, Rashid Khan tries to dig it out but the ball crashes into the base of middle stump. Gujarat losing their way in the chase. GT 156/8
+            </div>
+          </div>
+
+          <div class="commentary-ball single">
+            <div class="ball-info">
+              <span class="ball-number">18.1</span>
+              <span class="ball-runs single">1</span>
+            </div>
+            <div class="commentary-text">
+              Length ball outside off, Tewatia pushes it to deep cover and takes a quick single. Good running between the wickets.
+            </div>
+          </div>
+        </div>
+
+        <div class="over-group">
+          <div class="over-header">Over 18 • 8 runs • Tushar Deshpande bowling</div>
+          
+          <div class="commentary-ball single">
+            <div class="ball-info">
+              <span class="ball-number">18.6</span>
+              <span class="ball-runs single">1</span>
+            </div>
+            <div class="commentary-text">
+              Fuller delivery on middle, Rashid works it to mid-wicket for a single to retain strike. 8 runs from the over.
+            </div>
+          </div>
+
+          <div class="commentary-ball boundary">
+            <div class="ball-info">
+              <span class="ball-number">18.5</span>
+              <span class="ball-runs boundary">4</span>
+            </div>
+            <div class="commentary-text">
+              <strong>FOUR!</strong> Short and wide, Rashid Khan cuts it brilliantly over backward point. The ball races away to the boundary. Much needed boundary for GT!
+            </div>
+          </div>
+
+          <div class="commentary-ball dot">
+            <div class="ball-info">
+              <span class="ball-number">18.4</span>
+              <span class="ball-runs dot">0</span>
+            </div>
+            <div class="commentary-text">
+              Dot ball. Good length delivery, Rashid defends it back to the bowler. Pressure building on Gujarat.
+            </div>
+          </div>
+
+          <div class="commentary-ball single">
+            <div class="ball-info">
+              <span class="ball-number">18.3</span>
+              <span class="ball-runs single">1</span>
+            </div>
+            <div class="commentary-text">
+              Tewatia taps this length ball to point and scampers through for a quick single. Good running.
+            </div>
+          </div>
+
+          <div class="commentary-ball single">
+            <div class="ball-info">
+              <span class="ball-number">18.2</span>
+              <span class="ball-runs single">1</span>
+            </div>
+            <div class="commentary-text">
+              On the pads, Rashid flicks it to deep square leg for a single.
+            </div>
+          </div>
+
+          <div class="commentary-ball single">
+            <div class="ball-info">
+              <span class="ball-number">18.1</span>
+              <span class="ball-runs single">1</span>
+            </div>
+            <div class="commentary-text">
+              Back of length outside off, Tewatia guides it to third man for a single.
+            </div>
+          </div>
+        </div>
+
+        <div class="over-group">
+          <div class="over-header">Over 17 • 12 runs • M Pathirana bowling</div>
+          
+          <div class="commentary-ball six">
+            <div class="ball-info">
+              <span class="ball-number">17.6</span>
+              <span class="ball-runs six">6</span>
+            </div>
+            <div class="commentary-text">
+              <strong>SIX!</strong> What a shot! Slower ball, Tewatia picks it early and launches it over long-on for a massive six! 12 runs from the over.
+            </div>
+          </div>
+
+          <div class="commentary-ball boundary">
+            <div class="ball-info">
+              <span class="ball-number">17.5</span>
+              <span class="ball-runs boundary">4</span>
+            </div>
+            <div class="commentary-text">
+              <strong>FOUR!</strong> Edged and past the keeper! Fuller delivery outside off, Tewatia tries to drive but gets an edge that flies past MS Dhoni for four runs.
+            </div>
+          </div>
+
+          <div class="commentary-ball dot">
+            <div class="ball-info">
+              <span class="ball-number">17.4</span>
+              <span class="ball-runs dot">0</span>
+            </div>
+            <div class="commentary-text">
+              Yorker on middle stump, Tewatia can only dig it out. Excellent delivery from Pathirana.
+            </div>
+          </div>
+
+          <div class="commentary-ball single">
+            <div class="ball-info">
+              <span class="ball-number">17.3</span>
+              <span class="ball-runs single">1</span>
+            </div>
+            <div class="commentary-text">
+              Short ball, Rashid pulls it to deep mid-wicket for a single.
+            </div>
+          </div>
+
+          <div class="commentary-ball dot">
+            <div class="ball-info">
+              <span class="ball-number">17.2</span>
+              <span class="ball-runs dot">0</span>
+            </div>
+            <div class="commentary-text">
+              Slower bouncer, Rashid tries to pull but misses. Dot ball.
+            </div>
+          </div>
+
+          <div class="commentary-ball wicket">
+            <div class="ball-info">
+              <span class="ball-number">17.1</span>
+              <span class="ball-runs wicket">W</span>
+            </div>
+            <div class="commentary-text">
+              <strong>OUT! CAUGHT!</strong> David Miller departs! Short ball outside off, Miller tries to pull but gets a top edge. Rayudu at deep mid-wicket settles under it and takes a comfortable catch. Big wicket for CSK! GT 138/7
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scorecard Tab -->
+    <div id="scorecard" class="tab-content">
+      <div class="scorecard-section">
+        <div class="innings-header">
+          <div class="innings-title">Chennai Super Kings Innings</div>
+          <div class="innings-score">187/4 (20.0 overs)</div>
+        </div>
+
+        <table class="batting-table">
+          <thead>
+            <tr>
+              <th>Batter</th>
+              <th>R</th>
+              <th>B</th>
+              <th>4s</th>
+              <th>6s</th>
+              <th>SR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="batsman-name">Ruturaj Gaikwad</div>
+                <div class="dismissal-info">c Hardik b Rashid Khan</div>
+              </td>
+              <td>45</td>
+              <td>32</td>
+              <td>6</td>
+              <td>1</td>
+              <td>140.62</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Devon Conway</div>
+                <div class="dismissal-info">c Miller b Shami</div>
+              </td>
+              <td>28</td>
+              <td>21</td>
+              <td>4</td>
+              <td>0</td>
+              <td>133.33</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Ajinkya Rahane</div>
+                <div class="dismissal-info">lbw b Noor Ahmad</div>
+              </td>
+              <td>22</td>
+              <td>18</td>
+              <td>2</td>
+              <td>1</td>
+              <td>122.22</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Shivam Dube</div>
+                <div class="dismissal-info">not out</div>
+              </td>
+              <td>58</td>
+              <td>31</td>
+              <td>3</td>
+              <td>5</td>
+              <td>187.09</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">MS Dhoni (c) (wk)</div>
+                <div class="dismissal-info">c Sai Kishore b Rashid Khan</div>
+              </td>
+              <td>24</td>
+              <td>12</td>
+              <td>1</td>
+              <td>2</td>
+              <td>200.00</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Ravindra Jadeja</div>
+                <div class="dismissal-info">not out</div>
+              </td>
+              <td>8</td>
+              <td>6</td>
+              <td>1</td>
+              <td>0</td>
+              <td>133.33</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="fall-of-wickets">
+          <div class="fow-title">Fall of Wickets</div>
+          <div class="fow-list">
+            <span class="fow-item">1-62 (Conway, 7.2 ov)</span>
+            <span class="fow-item">2-89 (Gaikwad, 11.4 ov)</span>
+            <span class="fow-item">3-105 (Rahane, 13.5 ov)</span>
+            <span class="fow-item">4-176 (Dhoni, 18.3 ov)</span>
+          </div>
+        </div>
+
+        <h3 style="color: #4fc3f7; margin-top: 30px; margin-bottom: 15px;">Bowling</h3>
+        <table class="bowling-table">
+          <thead>
+            <tr>
+              <th>Bowler</th>
+              <th>O</th>
+              <th>M</th>
+              <th>R</th>
+              <th>W</th>
+              <th>Econ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Mohammed Shami</td>
+              <td>4</td>
+              <td>0</td>
+              <td>38</td>
+              <td>1</td>
+              <td>9.50</td>
+            </tr>
+            <tr>
+              <td>Hardik Pandya</td>
+              <td>4</td>
+              <td>0</td>
+              <td>35</td>
+              <td>0</td>
+              <td>8.75</td>
+            </tr>
+            <tr>
+              <td>Rashid Khan</td>
+              <td>4</td>
+              <td>0</td>
+              <td>32</td>
+              <td>2</td>
+              <td>8.00</td>
+            </tr>
+            <tr>
+              <td>Noor Ahmad</td>
+              <td>4</td>
+              <td>0</td>
+              <td>41</td>
+              <td>1</td>
+              <td>10.25</td>
+            </tr>
+            <tr>
+              <td>R Sai Kishore</td>
+              <td>4</td>
+              <td>0</td>
+              <td>41</td>
+              <td>0</td>
+              <td>10.25</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="scorecard-section">
+        <div class="innings-header">
+          <div class="innings-title">Gujarat Titans Innings <span class="batting-tag">BATTING</span></div>
+          <div class="innings-score">156/8 (18.2 overs)</div>
+        </div>
+
+        <table class="batting-table">
+          <thead>
+            <tr>
+              <th>Batter</th>
+              <th>R</th>
+              <th>B</th>
+              <th>4s</th>
+              <th>6s</th>
+              <th>SR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="batsman-name">Wriddhiman Saha (wk)</div>
+                <div class="dismissal-info">c Jadeja b Pathirana</div>
+              </td>
+              <td>18</td>
+              <td>15</td>
+              <td>3</td>
+              <td>0</td>
+              <td>120.00</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Shubman Gill</div>
+                <div class="dismissal-info">c Dhoni b Theekshana</div>
+              </td>
+              <td>42</td>
+              <td>28</td>
+              <td>5</td>
+              <td>2</td>
+              <td>150.00</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Sai Sudharsan</div>
+                <div class="dismissal-info">run out (Jadeja)</div>
+              </td>
+              <td>15</td>
+              <td>12</td>
+              <td>2</td>
+              <td>0</td>
+              <td>125.00</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Hardik Pandya (c)</div>
+                <div class="dismissal-info">b Pathirana</div>
+              </td>
+              <td>8</td>
+              <td>7</td>
+              <td>1</td>
+              <td>0</td>
+              <td>114.28</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Vijay Shankar</div>
+                <div class="dismissal-info">c Conway b Deshpande</div>
+              </td>
+              <td>12</td>
+              <td>9</td>
+              <td>1</td>
+              <td>1</td>
+              <td>133.33</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">David Miller</div>
+                <div class="dismissal-info">c Rayudu b Pathirana</div>
+              </td>
+              <td>31</td>
+              <td>20</td>
+              <td>2</td>
+              <td>2</td>
+              <td>155.00</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Rahul Tewatia</div>
+                <div class="dismissal-info">not out</div>
+              </td>
+              <td>18</td>
+              <td>12</td>
+              <td>1</td>
+              <td>1</td>
+              <td>150.00</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Rashid Khan</div>
+                <div class="dismissal-info">b Pathirana</div>
+              </td>
+              <td>9</td>
+              <td>6</td>
+              <td>1</td>
+              <td>0</td>
+              <td>150.00</td>
+            </tr>
+            <tr>
+              <td>
+                <div class="batsman-name">Noor Ahmad</div>
+                <div class="dismissal-info">not out</div>
+              </td>
+              <td>3</td>
+              <td>1</td>
+              <td>0</td>
+              <td>0</td>
+              <td>300.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="fall-of-wickets">
+          <div class="fow-title">Fall of Wickets</div>
+          <div class="fow-list">
+            <span class="fow-item">1-38 (Saha, 4.5 ov)</span>
+            <span class="fow-item">2-67 (Sudharsan, 8.3 ov)</span>
+            <span class="fow-item">3-82 (Pandya, 10.2 ov)</span>
+            <span class="fow-item">4-94 (Gill, 12.1 ov)</span>
+            <span class="fow-item">5-103 (Shankar, 13.4 ov)</span>
+            <span class="fow-item">6-138 (Miller, 17.1 ov)</span>
+            <span class="fow-item">7-145 (Sai Kishore, 17.5 ov)</span>
+            <span class="fow-item">8-156 (Rashid Khan, 18.2 ov)</span>
+          </div>
+        </div>
+
+        <h3 style="color: #4fc3f7; margin-top: 30px; margin-bottom: 15px;">Bowling</h3>
+        <table class="bowling-table">
+          <thead>
+            <tr>
+              <th>Bowler</th>
+              <th>O</th>
+              <th>M</th>
+              <th>R</th>
+              <th>W</th>
+              <th>Econ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tushar Deshpande</td>
+              <td>4</td>
+              <td>0</td>
+              <td>34</td>
+              <td>1</td>
+              <td>8.50</td>
+            </tr>
+            <tr>
+              <td>Deepak Chahar</td>
+              <td>3</td>
+              <td>0</td>
+              <td>28</td>
+              <td>0</td>
+              <td>9.33</td>
+            </tr>
+            <tr>
+              <td>Matheesha Pathirana</td>
+              <td>3.2</td>
+              <td>0</td>
+              <td>26</td>
+              <td>4</td>
+              <td>7.80</td>
+            </tr>
+            <tr>
+              <td>Maheesh Theekshana</td>
+              <td>4</td>
+              <td>0</td>
+              <td>32</td>
+              <td>1</td>
+              <td>8.00</td>
+            </tr>
+            <tr>
+              <td>Ravindra Jadeja</td>
+              <td>4</td>
+              <td>0</td>
+              <td>36</td>
+              <td>0</td>
+              <td>9.00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Partnerships Tab -->
+    <div id="partnerships" class="tab-content">
+      <div class="scorecard-section">
+        <h2 class="innings-header" style="border-bottom: none;">
+          <div class="innings-title">Chennai Super Kings Partnerships</div>
+        </h2>
+        
+        <table class="batting-table">
+          <thead>
+            <tr>
+              <th>Partnership</th>
+              <th>Runs</th>
+              <th>Balls</th>
+              <th>Wicket</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Ruturaj Gaikwad & Devon Conway</td>
+              <td>62</td>
+              <td>44</td>
+              <td>1st wkt</td>
+            </tr>
+            <tr>
+              <td>Ruturaj Gaikwad & Ajinkya Rahane</td>
+              <td>27</td>
+              <td>26</td>
+              <td>2nd wkt</td>
+            </tr>
+            <tr>
+              <td>Ajinkya Rahane & Shivam Dube</td>
+              <td>16</td>
+              <td>14</td>
+              <td>3rd wkt</td>
+            </tr>
+            <tr>
+              <td>Shivam Dube & MS Dhoni</td>
+              <td>71</td>
+              <td>34</td>
+              <td>4th wkt</td>
+            </tr>
+            <tr>
+              <td>Shivam Dube & Ravindra Jadeja</td>
+              <td>11*</td>
+              <td>10</td>
+              <td>5th wkt (unbroken)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="scorecard-section">
+        <h2 class="innings-header" style="border-bottom: none;">
+          <div class="innings-title">Gujarat Titans Partnerships</div>
+        </h2>
+        
+        <table class="batting-table">
+          <thead>
+            <tr>
+              <th>Partnership</th>
+              <th>Runs</th>
+              <th>Balls</th>
+              <th>Wicket</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Wriddhiman Saha & Shubman Gill</td>
+              <td>38</td>
+              <td>29</td>
+              <td>1st wkt</td>
+            </tr>
+            <tr>
+              <td>Shubman Gill & Sai Sudharsan</td>
+              <td>29</td>
+              <td>22</td>
+              <td>2nd wkt</td>
+            </tr>
+            <tr>
+              <td>Shubman Gill & Hardik Pandya</td>
+              <td>15</td>
+              <td>12</td>
+              <td>3rd wkt</td>
+            </tr>
+            <tr>
+              <td>Shubman Gill & Vijay Shankar</td>
+              <td>12</td>
+              <td>10</td>
+              <td>4th wkt</td>
+            </tr>
+            <tr>
+              <td>Vijay Shankar & David Miller</td>
+              <td>9</td>
+              <td>9</td>
+              <td>5th wkt</td>
+            </tr>
+            <tr>
+              <td>David Miller & Rahul Tewatia</td>
+              <td>35</td>
+              <td>21</td>
+              <td>6th wkt</td>
+            </tr>
+            <tr>
+              <td>Rahul Tewatia & R Sai Kishore</td>
+              <td>7</td>
+              <td>4</td>
+              <td>7th wkt</td>
+            </tr>
+            <tr>
+              <td>Rahul Tewatia & Rashid Khan</td>
+              <td>11</td>
+              <td>8</td>
+              <td>8th wkt</td>
+            </tr>
+            <tr>
+              <td>Rahul Tewatia & Noor Ahmad</td>
+              <td>0*</td>
+              <td>1</td>
+              <td>9th wkt (current)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Match Stats Tab -->
+    <div id="stats" class="tab-content">
+      <div class="scorecard-section">
+        <h2 class="innings-header" style="border-bottom: none;">
+          <div class="innings-title">Match Statistics</div>
+        </h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 10px;">
+            <h3 style="color: #4fc3f7; margin-bottom: 15px;">Powerplay (1-6 overs)</h3>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span>CSK:</span>
+              <span style="color: #4fc3f7; font-weight: bold;">52/0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>GT:</span>
+              <span style="color: #4fc3f7; font-weight: bold;">48/1</span>
+            </div>
+          </div>
+
+          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 10px;">
+            <h3 style="color: #4fc3f7; margin-bottom: 15px;">Middle Overs (7-15)</h3>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span>CSK:</span>
+              <span style="color: #4fc3f7; font-weight: bold;">82/3</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>GT:</span>
+              <span style="color: #4fc3f7; font-weight: bold;">67/4</span>
+            </div>
+          </div>
+
+          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 10px;">
+            <h3 style="color: #4fc3f7; margin-bottom: 15px;">Death Overs (16-20)</h3>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span>CSK:</span>
+              <span style="color: #4fc3f7; font-weight: bold;">53/1</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>GT:</span>
+              <span style="color: #4fc3f7; font-weight: bold;">41/3 (18.2)</span>
+            </div>
+          </div>
+
+          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 10px;">
+            <h3 style="color: #4fc3f7; margin-bottom: 15px;">Boundaries</h3>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span>CSK Fours:</span>
+              <span style="color: #66bb6a; font-weight: bold;">17</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span>CSK Sixes:</span>
+              <span style="color: #9c27b0; font-weight: bold;">9</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span>GT Fours:</span>
+              <span style="color: #66bb6a; font-weight: bold;">15</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>GT Sixes:</span>
+              <span style="color: #9c27b0; font-weight: bold;">6</span>
+            </div>
+          </div>
+
+          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 10px;">
+            <h3 style="color: #4fc3f7; margin-bottom: 15px;">Extras</h3>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span>CSK Total:</span>
+              <span style="font-weight: bold;">8 (wd 5, nb 2, lb 1)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>GT Total:</span>
+              <span style="font-weight: bold;">12 (wd 7, nb 3, lb 2)</span>
+            </div>
+          </div>
+
+          <div style="background-color: #2a2a2a; padding: 20px; border-radius: 10px;">
+            <h3 style="color: #4fc3f7; margin-bottom: 15px;">Dot Ball %</h3>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <span>CSK Bowled:</span>
+              <span style="font-weight: bold;">42.7%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span>GT Bowled:</span>
+              <span style="font-weight: bold;">38.3%</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="color: #4fc3f7; margin-top: 30px; margin-bottom: 15px;">Top Performers</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+          <div style="background-color: #2a2a2a; padding: 15px; border-radius: 8px;">
+            <div style="color: #999; font-size: 0.85rem; margin-bottom: 5px;">Highest Score</div>
+            <div style="font-size: 1.2rem; font-weight: bold;">Shivam Dube - 58(31)</div>
+          </div>
+          <div style="background-color: #2a2a2a; padding: 15px; border-radius: 8px;">
+            <div style="color: #999; font-size: 0.85rem; margin-bottom: 5px;">Best Bowling</div>
+            <div style="font-size: 1.2rem; font-weight: bold;">M Pathirana - 4/26</div>
+          </div>
+          <div style="background-color: #2a2a2a; padding: 15px; border-radius: 8px;">
+            <div style="color: #999; font-size: 0.85rem; margin-bottom: 5px;">Most Sixes</div>
+            <div style="font-size: 1.2rem; font-weight: bold;">Shivam Dube - 5</div>
+          </div>
+          <div style="background-color: #2a2a2a; padding: 15px; border-radius: 8px;">
+            <div style="color: #999; font-size: 0.85rem; margin-bottom: 5px;">Best Partnership</div>
+            <div style="font-size: 1.2rem; font-weight: bold;">Dube & Dhoni - 71(34)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tabName) {
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content');
+      tabContents.forEach(content => {
+        content.classList.remove('active');
+      });
+
+      // Remove active class from all buttons
+      const tabButtons = document.querySelectorAll('.tab-btn');
+      tabButtons.forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Show selected tab content
+      document.getElementById(tabName).classList.add('active');
+
+      // Add active class to clicked button
+      event.target.classList.add('active');
+    }
+
+    // Auto-refresh commentary every 10 seconds (simulated)
+    setInterval(() => {
+      // In a real application, this would fetch new data from an API
+      console.log('Refreshing live scores...');
+    }, 10000);
+  </script>
+</body>
+</html>

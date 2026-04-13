@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TechZon - Premium Tech & AI Insights</title>
+  <style>
+    /* --- RESET --- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #0d0d0d;
+      color: #e0e0e0;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* --- HEADER --- */
+    header {
+      background: linear-gradient(90deg, #0a0a0a, #111827);
+      padding: 1.2rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.9rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #00b7ff, #00ffe7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav a {
+      color: #ccc;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: color 0.3s, transform 0.3s;
+    }
+
+    .nav a:hover {
+      color: #00ffe7;
+      transform: translateY(-2px);
+    }
+
+    /* --- CONTAINER --- */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* --- HERO --- */
+    .hero {
+      background: linear-gradient(145deg, #141414, #1e1e1e);
+      padding: 3rem 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      background: linear-gradient(90deg, #00b7ff, #00ffe7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.8rem;
+      font-weight: 700;
+    }
+
+    .hero p {
+      color: #aaa;
+      font-size: 1.1rem;
+    }
+
+    /* --- SECTION TITLES --- */
+    .section-title {
+      font-size: 1.9rem;
+      margin: 2.5rem 0 1.5rem;
+      color: #fff;
+      font-weight: 700;
+      border-bottom: 2px solid #00ffe7;
+      padding-bottom: 0.5rem;
+    }
+
+    /* --- PHONE CARDS --- */
+    .phone-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .phone-card {
+      background: #151515;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 0 25px rgba(0,255,231,0.15);
+    }
+
+    .phone-image {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .phone-content {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .phone-badge {
+      display: inline-block;
+      padding: 0.35rem 0.8rem;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 0.8rem;
+      width: fit-content;
+    }
+
+    .phone-badge.new { background: #003b2d; color: #00ffb7; }
+    .phone-badge.drop { background: #330000; color: #ff5c5c; }
+    .phone-badge { background: #222; color: #aaa; }
+
+    .phone-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.7rem;
+    }
+
+    .phone-specs {
+      color: #bbb;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      flex: 1;
+    }
+
+    .price {
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #00ffe7;
+    }
+
+    .old-price {
+      color: #777;
+      text-decoration: line-through;
+      margin-left: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .discount {
+      display: inline-block;
+      margin-left: 0.5rem;
+      background: #cc0c39;
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .shop-links {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .shop-btn {
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      background: #00b7ff;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-align: center;
+      flex: 1;
+      transition: all 0.3s;
+    }
+
+    .shop-btn:hover {
+      background: #00ffe7;
+      color: #000;
+      box-shadow: 0 0 15px rgba(0,255,231,0.4);
+    }
+
+    .shop-btn.secondary {
+      background: #1e1e1e;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #ccc;
+    }
+
+    .shop-btn.secondary:hover {
+      background: #2a2a2a;
+      color: #00ffe7;
+    }
+
+    /* --- NEWS CARDS --- */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .news-card {
+      background: #151515;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .news-card:hover {
+      box-shadow: 0 0 25px rgba(0,255,231,0.1);
+      transform: translateY(-5px);
+    }
+
+    .news-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .news-content {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .news-category {
+      display: inline-block;
+      padding: 0.3rem 0.7rem;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+      width: fit-content;
+    }
+
+    .news-category.hardware { background: #003b5c; color: #00b7ff; }
+    .news-category.ai { background: #2a004d; color: #d28cff; }
+    .news-category { background: #222; color: #bbb; }
+
+    .news-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 0.7rem;
+      flex: 1;
+    }
+
+    .news-description {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .news-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 1rem;
+      margin-top: auto;
+    }
+
+    .news-date {
+      font-size: 0.82rem;
+      color: #777;
+    }
+
+    .read-more {
+      color: #00ffe7;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+
+    .read-more:hover {
+      color: #00b7ff;
+      text-decoration: underline;
+    }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 2rem; }
+      .nav { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-content">
+      <div class="logo">TECHZON</div>
+      <nav class="nav">
+        <a href="#phones">Smartphones</a>
+        <a href="#tech-news">Tech News</a>
+        <a href="#ai-news">AI News</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="hero">
+      <h1>Explore the Future of Technology</h1>
+      <p>Premium insights, flagship deals, and AI innovations — all in one zone.</p>
+    </div>
+    <!-- Latest Phones Section -->
+    <h2 class="section-title" id="phones">Latest Smartphones</h2>
+    <div class="phone-grid">
+      <div class="phone-card">
+        <img src="https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&h=400&fit=crop" alt="iPhone 16 Pro Max" class="phone-image">
+        <div class="phone-content">
+          <span class="phone-badge new">New Launch</span>
+          <div class="phone-name">iPhone 16 Pro Max</div>
+          <div class="phone-specs">
+            A18 Pro Chip • 6.9" Super Retina XDR<br>
+            48MP Main Camera • 5x Telephoto<br>
+            Titanium Design • USB-C Port
+          </div>
+          <div class="price-section">
+            <span class="price">$1,199</span>
+          </div>
+          <div class="shop-links">
+            <a href="https://www.amazon.com/s?k=iPhone+16+Pro+Max" class="shop-btn" target="_blank">Amazon</a>
+            <a href="https://www.apple.com/shop/buy-iphone" class="shop-btn secondary" target="_blank">Apple</a>
+            <a href="https://www.bestbuy.com/site/searchpage.jsp?st=iphone+16+pro+max" class="shop-btn secondary" target="_blank">Best Buy</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-card">
+        <img src="https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&h=400&fit=crop" alt="Samsung Galaxy S24 Ultra" class="phone-image">
+        <div class="phone-content">
+          <span class="phone-badge drop">Price Drop</span>
+          <div class="phone-name">Samsung Galaxy S24 Ultra</div>
+          <div class="phone-specs">
+            Snapdragon 8 Gen 3 • 6.8" Dynamic AMOLED<br>
+            200MP Camera • S Pen Included<br>
+            AI Photo Editing • 5000mAh Battery
+          </div>
+          <div class="price-section">
+            <span class="price">$999</span>
+            <span class="old-price">$1,299</span>
+            <span class="discount">23% OFF</span>
+          </div>
+          <div class="shop-links">
+            <a href="https://www.amazon.com/s?k=Samsung+Galaxy+S24+Ultra" class="shop-btn" target="_blank">Amazon</a>
+            <a href="https://www.samsung.com/us/smartphones/galaxy-s24/" class="shop-btn secondary" target="_blank">Samsung</a>
+            <a href="https://www.bestbuy.com/site/searchpage.jsp?st=galaxy+s24+ultra" class="shop-btn secondary" target="_blank">Best Buy</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-card">
+        <img src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=600&h=400&fit=crop" alt="Google Pixel 9 Pro" class="phone-image">
+        <div class="phone-content">
+          <span class="phone-badge new">Hot Deal</span>
+          <div class="phone-name">Google Pixel 9 Pro</div>
+          <div class="phone-specs">
+            Google Tensor G4 • 6.7" LTPO OLED<br>
+            50MP Triple Camera • Magic Editor<br>
+            7 Years Updates • Best-in-class AI
+          </div>
+          <div class="price-section">
+            <span class="price">$899</span>
+          </div>
+          <div class="shop-links">
+            <a href="https://www.amazon.com/s?k=Google+Pixel+9+Pro" class="shop-btn" target="_blank">Amazon</a>
+            <a href="https://store.google.com/us/category/phones" class="shop-btn secondary" target="_blank">Google</a>
+            <a href="https://www.bestbuy.com/site/searchpage.jsp?st=pixel+9+pro" class="shop-btn secondary" target="_blank">Best Buy</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="phone-card">
+        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=400&fit=crop" alt="OnePlus 12" class="phone-image">
+        <div class="phone-content">
+          <span class="phone-badge drop">Price Drop</span>
+          <div class="phone-name">OnePlus 12</div>
+          <div class="phone-specs">
+            Snapdragon 8 Gen 3 • 6.82" AMOLED 120Hz<br>
+            Hasselblad Camera • 100W Fast Charging<br>
+            16GB RAM • OxygenOS 14
+          </div>
+          <div class="price-section">
+            <span class="price">$699</span>
+            <span class="old-price">$799</span>
+            <span class="discount">13% OFF</span>
+          </div>
+          <div class="shop-links">
+            <a href="https://www.amazon.com/s?k=OnePlus+12" class="shop-btn" target="_blank">Amazon</a>
+            <a href="https://www.oneplus.com/us" class="shop-btn secondary" target="_blank">OnePlus</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tech News Section -->
+    <h2 class="section-title" id="tech-news">Latest Tech News</h2>
+    <div class="news-grid">
+      <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&h=300&fit=crop" alt="Tech News" class="news-image">
+        <div class="news-content">
+          <span class="news-category hardware">Hardware</span>
+          <div class="news-title">Apple's M4 Chips Break Performance Records</div>
+          <div class="news-description">
+            Apple's new M4 Pro and M4 Max chips are showing unprecedented performance gains, with the M4 Max featuring up to 16 CPU cores and 40 GPU cores, making it the most powerful chip for creative professionals.
+          </div>
+          <div class="news-meta">
+            <span class="news-date">October 12, 2025</span>
+            <a href="https://www.theverge.com/" class="read-more" target="_blank">Read more</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1556656793-08538906a9f8?w=600&h=300&fit=crop" alt="Samsung Display" class="news-image">
+        <div class="news-content">
+          <span class="news-category">Innovation</span>
+          <div class="news-title">Samsung Announces Foldable Display Breakthrough</div>
+          <div class="news-description">
+            Samsung Display has developed a new ultra-thin glass technology that can fold over 200,000 times without degradation, promising more durable foldable phones in 2026.
+          </div>
+          <div class="news-meta">
+            <span class="news-date">October 11, 2025</span>
+            <a href="https://www.theverge.com/" class="read-more" target="_blank">Read more</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&h=300&fit=crop" alt="USB Technology" class="news-image">
+        <div class="news-content">
+          <span class="news-category hardware">Connectivity</span>
+          <div class="news-title">USB 4.0 Reaches 120Gbps Transfer Speeds</div>
+          <div class="news-description">
+            The USB Implementers Forum has announced USB 4.0 v2.1, tripling data transfer speeds to 120Gbps, enabling 8K displays and lightning-fast external storage solutions.
+          </div>
+          <div class="news-meta">
+            <span class="news-date">October 10, 2025</span>
+            <a href="https://www.techcrunch.com/" class="read-more" target="_blank">Read more</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI News Section -->
+    <h2 class="section-title" id="ai-news">AI & Innovation News</h2>
+    <div class="news-grid">
+      <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=300&fit=crop" alt="AI Technology" class="news-image">
+        <div class="news-content">
+          <span class="news-category ai">Artificial Intelligence</span>
+          <div class="news-title">ChatGPT-5 Multimodal Capabilities Revealed</div>
+          <div class="news-description">
+            OpenAI's upcoming GPT-5 model demonstrates advanced reasoning across text, images, audio, and video simultaneously, with improved accuracy and contextual understanding that rivals human experts.
+          </div>
+          <div class="news-meta">
+            <span class="news-date">October 13, 2025</span>
+            <a href="https://techcrunch.com/" class="read-more" target="_blank">Read more</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1591488320449-011701bb6704?w=600&h=300&fit=crop" alt="AI Chips" class="news-image">
+        <div class="news-content">
+          <span class="news-category hardware">Hardware</span>
+          <div class="news-title">AI Chip Shortage Eases as Production Ramps Up</div>
+          <div class="news-description">
+            NVIDIA, AMD, and Intel announce expanded production capacity for AI accelerators, with new fabs coming online in 2026. This should ease the GPU shortage that has plagued the industry.
+          </div>
+          <div class="news-meta">
+            <span class="news-date">October 12, 2025</span>
+            <a href="https://www.wired.com/" class="read-more" target="_blank">Read more</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=300&fit=crop" alt="Medical AI" class="news-image">
+        <div class="news-content">
+          <span class="news-category ai">Healthcare</span>
+          <div class="news-title">AI Discovers New Antibiotics in Hours</div>
+          <div class="news-description">
+            MIT researchers use AI to identify novel antibiotic compounds in just 3 hours, a process that traditionally takes years. The breakthrough could revolutionize drug discovery and combat antibiotic resistance.
+          </div>
+          <div class="news-meta">
+            <span class="news-date">October 9, 2025</span>
+            <a href="https://www.sciencedaily.com/" class="read-more" target="_blank">Read more</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1617704548623-340376564e68?w=600&h=300&fit=crop" alt="Tesla Self Driving" class="news-image">
+        <div class="news-content">
+          <span class="news-category ai">Autonomous Vehicles</span>
+          <div class="news-title">Tesla's FSD V13 Achieves Level 4 Autonomy</div>
+          <div class="news-description">
+            Tesla's Full Self-Driving version 13 has achieved Level 4 autonomous driving certification in several US states, allowing hands-free operation in designated areas without human intervention.
+          </div>
+          <div class="news-meta">
+            <span class="news-date">October 8, 2025</span>
+            <a href="https://www.theverge.com/" class="read-more" target="_blank">Read more</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=600&h=300&fit=crop" alt="Google AI" class="news-image">
+        <div class="news-content">
+          <span class="news-category ai">Artificial Intelligence</span>
+          <div class="news-title">Google's Gemini 2.0 Launches with Agent Capabilities</div>
+          <div class="news-description">
+            Google unveils Gemini 2.0, featuring autonomous agent capabilities that can complete multi-step tasks, book appointments, and manage workflows with minimal human oversight.
+          </div>
+          <div class="news-meta">
+            <span class="news-date">October 7, 2025</span>
+            <a href="https://techcrunch.com/" class="read-more" target="_blank">Read more</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=600&h=300&fit=crop" alt="Protein Research" class="news-image">
+        <div class="news-content">
+          <span class="news-category ai">Research</span>
+          <div class="news-title">AI Predicts Protein Structures with 99% Accuracy</div>
+          <div class="news-description">
+            DeepMind's AlphaFold 3 achieves 99% accuracy in protein structure prediction, accelerating research in drug development, disease understanding, and synthetic biology applications.
+          </div>
+          <div class="news-meta">
+            <span class="news-date">October 6, 2025</span>
+            <a href="https://www.nature.com/" class="read-more" target="_blank">Read more</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

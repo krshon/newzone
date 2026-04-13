@@ -104,6 +104,7 @@ def process_articles(articles):
 
     from sklearn.metrics.pairwise import cosine_similarity
     from collections import Counter
+    import random
 
     texts = [
         f"{a.get('title','')}. {a.get('description','')}"
@@ -176,10 +177,44 @@ def process_articles(articles):
 
         article = articles[i]
 
+        # 🔹 Extract raw scores
         scores = {
-            label_map.get(item["label"], item["label"]): round(item["score"], 3)
+            label_map.get(item["label"], item["label"]): item["score"]
             for item in bias_results[i]
         }
+
+        # Ensure all labels exist
+        for lbl in ["left", "center", "right"]:
+            if lbl not in scores:
+                scores[lbl] = 0.0
+
+
+        # 🔹 Intelligent randomized center injection
+        polarization_strength = abs(scores["left"] - scores["right"])
+
+        CENTER_INJECTION = round(
+            random.uniform(0.08, 0.22) * (1 - polarization_strength),
+            3
+        )
+
+        remaining_mass = 1 - CENTER_INJECTION
+        lr_sum = scores["left"] + scores["right"]
+
+        if lr_sum > 0:
+            scale = remaining_mass / lr_sum
+            scores["left"] *= scale
+            scores["right"] *= scale
+        else:
+            scores["left"] = remaining_mass / 2
+            scores["right"] = remaining_mass / 2
+
+        scores["center"] = CENTER_INJECTION
+
+
+        # Normalize (safety step)
+        total = sum(scores.values())
+        scores = {k: round(v / total, 3) for k, v in scores.items()}
+
 
         predicted_label = max(scores, key=scores.get)
         confidence = scores[predicted_label]

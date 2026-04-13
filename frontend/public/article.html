@@ -175,7 +175,7 @@ max-width:760px;
 margin-bottom:1.2rem;
 }
 
-/* SOURCE ANALYSIS */
+/* SECTION LABEL */
 
 .section-label{
 font-size:11px;
@@ -184,6 +184,8 @@ text-transform:uppercase;
 color:#444;
 margin:2.5rem 0 1rem;
 }
+
+/* SOURCE ANALYSIS BAR */
 
 .combined-bar-wrap{
 height:6px;
@@ -257,6 +259,80 @@ font-size:11px;
 color:#444;
 }
 
+/* COMMENTS SECTION */
+
+.comment-box{
+max-width:760px;
+margin-top:1.5rem;
+}
+
+.comment-input-wrap{
+display:flex;
+flex-direction:column;
+gap:10px;
+margin-bottom:1.5rem;
+}
+
+.comment-input-wrap input,
+.comment-input-wrap textarea{
+background:#141414;
+border:1px solid #1e1e1e;
+color:#ccc;
+padding:10px;
+border-radius:4px;
+font-family:'Inter',sans-serif;
+font-size:14px;
+}
+
+.comment-input-wrap textarea{
+min-height:80px;
+resize:vertical;
+}
+
+.comment-input-wrap button{
+width:160px;
+background:transparent;
+border:1px solid #2a2a2a;
+color:#888;
+padding:8px;
+font-size:12px;
+letter-spacing:.08em;
+cursor:pointer;
+border-radius:3px;
+transition:.2s;
+}
+
+.comment-input-wrap button:hover{
+border-color:#c8a96e;
+color:#c8a96e;
+}
+
+.comment{
+background:#141414;
+border:1px solid #1e1e1e;
+padding:12px;
+border-radius:6px;
+margin-bottom:10px;
+}
+
+.comment-name{
+font-size:13px;
+color:#c8a96e;
+margin-bottom:4px;
+}
+
+.comment-time{
+font-size:11px;
+color:#555;
+margin-bottom:6px;
+}
+
+.comment-text{
+font-size:14px;
+color:#ccc;
+line-height:1.6;
+}
+
 </style>
 </head>
 
@@ -275,7 +351,6 @@ color:#444;
 </div>
 </div>
 
-
 <div class="wrap">
 
 <div class="tag">India · Economy</div>
@@ -287,7 +362,6 @@ RBI Proposes Delay Mechanism for High-Value Digital Payments to Reduce Online Fr
 <p class="meta">
 April 2026 · Reserve Bank Policy Desk · 3 min read
 </p>
-
 
 <div class="img-grid">
 
@@ -305,133 +379,68 @@ April 2026 · Reserve Bank Policy Desk · 3 min read
 Left: RBI headquarters in Mumbai. Right: Growth of digital payments across India.
 </p>
 
-
 <button class="summarize-btn"
 onclick="toggleSummary()" id="sum-btn">
-
 ↓ Summarise article
-
 </button>
 
-
 <div class="summary-box" id="summary-box">
-
-The Reserve Bank of India has proposed introducing a short delay window for high-value digital transactions above ₹10,000 to curb rising online fraud. The proposal would allow users time to cancel suspicious transfers while strengthening safeguards in India’s fast-growing real-time payments ecosystem.
-
+The Reserve Bank of India has proposed introducing a short delay window for high-value digital transactions above ₹10,000 to curb rising online fraud.
 </div>
-
 
 <div class="body-text">
 
-<p>
+<p>The Reserve Bank of India has proposed a safeguard mechanism introducing a short delay before processing certain high-value digital payments.</p>
 
-The Reserve Bank of India has proposed a new safeguard mechanism that could introduce a short delay before processing certain high-value digital payments, aiming to reduce fraud risks in India’s rapidly expanding online transactions ecosystem.
+<p>The delay would apply to first-time transfers or transactions exceeding ₹10,000.</p>
 
-</p>
+<p>India processes billions of UPI transactions monthly, though fraud attempts have risen alongside adoption.</p>
 
-<p>
-
-Officials said the measure would primarily apply to first-time transactions between accounts or unusually large transfers exceeding ₹10,000. The delay window would allow users to verify payment authenticity and cancel suspicious activity before completion.
-
-</p>
-
-<p>
-
-India currently processes billions of Unified Payments Interface (UPI) transactions each month, making it one of the world’s fastest-growing digital payment networks. However, authorities have warned that fraud attempts have increased alongside adoption.
-
-</p>
-
-<p>
-
-If implemented, the proposal could balance convenience with security while preserving the speed advantages that made India’s digital payment infrastructure globally influential.
-
-</p>
+<p>The proposal aims to balance security with speed advantages in India’s digital payments infrastructure.</p>
 
 </div>
 
-
-<div class="section-label">
-
-Source Analysis · 18 sources
-
-</div>
-
+<div class="section-label">Source Analysis · 18 sources</div>
 
 <div class="combined-bar-wrap">
-
-<div class="seg" id="s-left"
-style="width:0%;background:#5a82c8"></div>
-
-<div class="seg" id="s-neutral"
-style="width:0%;background:#555"></div>
-
-<div class="seg" id="s-right"
-style="width:0%;background:#c86060"></div>
-
+<div class="seg" id="s-left" style="width:0%;background:#5a82c8"></div>
+<div class="seg" id="s-neutral" style="width:0%;background:#555"></div>
+<div class="seg" id="s-right" style="width:0%;background:#c86060"></div>
 </div>
 
-
 <div class="truth-row">
-
 <span>Fact score</span>
-
 <div class="truth-bar-wrap">
 <div class="truth-fill" id="t-fill"></div>
 </div>
-
 <span>94%</span>
-
 </div>
-
 
 <div class="related-grid">
-
-<div class="related-card">
-<div class="related-card-title">
-UPI Transactions Cross New Monthly Record
-</div>
-<div class="related-card-meta">
-April 2026 · Economy
-</div>
+<div class="related-card"><div class="related-card-title">UPI Transactions Cross New Monthly Record</div><div class="related-card-meta">April 2026 · Economy</div></div>
+<div class="related-card"><div class="related-card-title">Government Expands Digital Payment Security Framework</div><div class="related-card-meta">April 2026 · Policy</div></div>
+<div class="related-card"><div class="related-card-title">Cybercrime Complaints Rise With Payment App Usage</div><div class="related-card-meta">March 2026 · Crime</div></div>
+<div class="related-card"><div class="related-card-title">India’s Digital Economy Targets $1 Trillion Milestone</div><div class="related-card-meta">March 2026 · Economy</div></div>
 </div>
 
+<!-- COMMENTS -->
 
-<div class="related-card">
-<div class="related-card-title">
-Government Expands Digital Payment Security Framework
-</div>
-<div class="related-card-meta">
-April 2026 · Policy
-</div>
-</div>
+<div class="section-label">Comments</div>
 
+<div class="comment-box">
 
-<div class="related-card">
-<div class="related-card-title">
-Cybercrime Complaints Rise With Payment App Usage
-</div>
-<div class="related-card-meta">
-March 2026 · Crime
-</div>
+<div class="comment-input-wrap">
+<input type="text" id="comment-name" placeholder="Your name">
+<textarea id="comment-text" placeholder="Write a comment..."></textarea>
+<button onclick="addComment()">Post Comment</button>
 </div>
 
-
-<div class="related-card">
-<div class="related-card-title">
-India’s Digital Economy Targets $1 Trillion Milestone
-</div>
-<div class="related-card-meta">
-March 2026 · Economy
-</div>
-</div>
-
+<div id="comment-list"></div>
 
 </div>
 
 </div>
-
 </div>
-
 
 <script>
 
@@ -445,18 +454,55 @@ setTimeout(()=>{
 document.getElementById('t-fill').style.width='94%'
 },500)
 
-
 function toggleSummary(){
-
 const box=document.getElementById('summary-box')
-
 const btn=document.getElementById('sum-btn')
-
 const v=box.classList.toggle('visible')
-
 btn.textContent=v?'↑ Hide summary':'↓ Summarise article'
-
 }
+
+function addComment(){
+
+const name=document.getElementById('comment-name').value.trim()
+const text=document.getElementById('comment-text').value.trim()
+
+if(!name || !text) return
+
+const comment={name,text,time:new Date().toLocaleString()}
+
+let comments=JSON.parse(localStorage.getItem("nz-comments")||"[]")
+
+comments.unshift(comment)
+
+localStorage.setItem("nz-comments",JSON.stringify(comments))
+
+renderComments()
+
+document.getElementById('comment-name').value=""
+document.getElementById('comment-text').value=""
+}
+
+function renderComments(){
+
+const list=document.getElementById("comment-list")
+
+let comments=JSON.parse(localStorage.getItem("nz-comments")||"[]")
+
+list.innerHTML=""
+
+comments.forEach(c=>{
+
+list.innerHTML+=`
+<div class="comment">
+<div class="comment-name">${c.name}</div>
+<div class="comment-time">${c.time}</div>
+<div class="comment-text">${c.text}</div>
+</div>
+`
+})
+}
+
+renderComments()
 
 </script>
 

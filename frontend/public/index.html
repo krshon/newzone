@@ -13,25 +13,21 @@
   <nav class="nz-nav">
     <div class="nz-logo">
       <div class="nz-logo-icon">
-        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-          <circle cx="11" cy="11" r="10" stroke="#22c55e" stroke-width="1.5"/>
-          <path d="M6 15L10 8L13 12L15.5 9" stroke="#22c55e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="15.5" cy="9" r="1.5" fill="#22c55e"/>
-        </svg>
-      </div>
+  <img src="imgs/logo.png" alt="NEWZON Logo" class="nz-logo-img">
+</div>
+
       <span class="nz-logo-text">NEWZON</span>
     </div>
     <div class="nz-nav-pills">
       <button class="nz-pill active" data-filter="all">All</button>
       <button class="nz-pill" data-filter="Politics">Politics</button>
       <button class="nz-pill" data-filter="Tech">Tech</button>
-      <button class="nz-pill" data-filter="World">World</button>
+      <a href="sports.html" class="nz-pill">CricJET</a>
+      <a href="sports.html" class="nz-pill">TechZON</a>
       <button class="nz-pill" data-filter="Business">Business</button>
+      <a href="article.html" class="nz-pill">Originals</a>
     </div>
     <div class="nz-live">
-      <div class="nz-live-dot"></div>
-      Live feed
-    </div>
   </nav>
 
   <!-- LAYOUT -->
@@ -202,8 +198,8 @@ fetch("/api/news")
 
       const clusterSection = document.createElement("div");
       clusterSection.className = "nz-cluster";
-      // data-count drives the flex-basis so small clusters don't balloon
-      clusterSection.setAttribute("data-count", Math.min(clusterArticles.length, 3));
+      // data-count: 1-2 = half-width column, 3+ = full width
+      clusterSection.setAttribute("data-count", clusterArticles.length >= 3 ? "3" : String(clusterArticles.length));
       clusterSection.innerHTML = `
         <div class="nz-cluster-header">
           <div class="nz-cluster-accent"></div>

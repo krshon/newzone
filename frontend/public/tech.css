@@ -1,0 +1,87 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: url('imgs/bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #e0f7fa;
+  backdrop-filter: blur(3px);
+}
+
+.container {
+  max-width: 900px;
+  margin: 100px auto 20px;
+  background: rgba(10, 10, 10, 0.6);
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 0 18px rgba(0, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+header {
+  display: none;
+}
+
+#logo {
+  max-width: 150px;
+}
+
+.tech-section {
+  text-align: center;
+}
+
+h2 {
+  color: #00e5ff;
+  font-weight: bold;
+  font-size: 1.8rem;
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+}
+
+.news-box {
+  background: rgba(0, 183, 255, 0.1);
+  color: #ffffff;
+  padding: 18px;
+  margin: 20px 0;
+  border-radius: 12px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+}
+
+.news-box:hover {
+  transform: translateY(-3px) scale(1.02);
+  background: rgba(0, 183, 255, 0.2);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+}
+
+.news-box h3 {
+  color: #ffa726;
+  font-weight: bold;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 5px rgba(255, 165, 0, 0.3);
+}
+
+.news-box p {
+  font-size: 15.5px;
+  color: #d9edf7;
+  font-weight: 500;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+@media (max-width: 800px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .container {
+    width: 95%;
+    margin: 120px auto;
+  }
+}
