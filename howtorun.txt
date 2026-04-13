@@ -1,3 +1,7 @@
 C:\Users\krish\OneDrive\Documents\newzone\backend>node server.js
 
 C:\Users\krish\OneDrive\Documents\newzone\videosummarizer>python app.py
+
+C:\Users\krish\newzone\newzon-fake>uvicorn main:app --reload --port 8000
+
+C:\Users\krish\newzone\chatbot>uvicorn main:app --reload --port 5000

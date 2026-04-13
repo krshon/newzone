@@ -23,8 +23,8 @@
       <button class="nz-pill" data-filter="Politics">Politics</button>
       <button class="nz-pill" data-filter="Tech">Tech</button>
       <a href="sports.html" class="nz-pill">CricJET</a>
-      <a href="sports.html" class="nz-pill">TechZON</a>
-      <button class="nz-pill" data-filter="Business">Business</button>
+      <a href="tech.html" class="nz-pill">TechZON</a>
+      <a href="newzon-fake/check.html" class="nz-pill">VERFIER</a>
       <a href="article.html" class="nz-pill">Originals</a>
     </div>
     <div class="nz-live">
@@ -270,6 +270,15 @@ fetch("/api/news")
     console.error(err);
   });
 </script>
-
+<!-- NEWZON AI BLOB BUTTON -->
+<div id="aiBlob" onclick="openAskNewzon()">
+  <div class="blob-core">AI</div>
+  <span class="blob-label">Ask NEWZON</span>
+</div>
 </body>
+<script>
+function openAskNewzon() {
+  window.open("/chatbot/chat.html", "AskNewzon", "width=420,height=720");
+}
+</script>
 </html>
