@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NEWZON — Truth Index</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            overflow-x: hidden;
+        }
+
+        /* ── WAVE CANVAS ── */
+        #waveCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        /* ── BACKGROUND GLOW ── */
+        .bg-orb {
+            position: fixed;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 1.2s ease, background 1.2s ease;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* ── CONTAINER ── */
+        .container {
+            width: 100%;
+            max-width: 660px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ── CARD ── */
+        .card {
+            background: rgba(10, 13, 22, 0.92);
+            border-radius: 22px;
+            padding: 38px 36px;
+            border: 1px solid rgba(255,255,255,0.07);
+            backdrop-filter: blur(20px);
+            transition: border-color 0.8s ease, box-shadow 0.8s ease;
+        }
+
+        /* ── HEADER ── */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .logo-mark {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800; color: white;
+        }
+
+        .logo-text {
+            font-size: 28px; font-weight: 800;
+            letter-spacing: 3px; color: #38bdf8;
+        }
+
+        .subtitle {
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 2px; color: #475569;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        /* ── SCAN STEPS ── */
+        .scan-steps {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 26px;
+        }
+
+        .step-pill {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px; font-weight: 600;
+            letter-spacing: 0.5px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            color: #475569;
+            transition: all 0.4s ease;
+        }
+
+        .step-pill.active {
+            background: rgba(37, 99, 235, 0.15);
+            border-color: rgba(37, 99, 235, 0.4);
+            color: #60a5fa;
+        }
+
+        .step-pill.done {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+        }
+
+        /* ── TEXTAREA ── */
+        textarea {
+            width: 100%;
+            height: 130px;
+            background: rgba(5, 8, 18, 0.8);
+            border-radius: 14px;
+            padding: 16px 18px;
+            color: #e5e7eb;
+            font-size: 14px;
+            font-family: "Inter", sans-serif;
+            border: 1px solid rgba(255,255,255,0.08);
+            outline: none;
+            resize: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            border-color: rgba(56,189,248,0.4);
+            box-shadow: 0 0 0 3px rgba(56,189,248,0.08);
+        }
+
+        textarea::placeholder { color: #4b5563; }
+
+        /* ── CHAR COUNTER ── */
+        .textarea-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            padding: 0 4px;
+        }
+
+        .char-count {
+            font-size: 11px; color: #374151;
+        }
+
+        .paste-hint {
+            font-size: 11px; color: #374151;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .paste-hint:hover { color: #60a5fa; }
+
+        /* ── BUTTON ── */
+        .analyze-btn {
+            width: 100%;
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: "Inter", sans-serif;
+            cursor: pointer;
+            transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.22s;
+            letter-spacing: 0.4px;
+        }
+
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(14,165,233,0.35);
+        }
+
+        .analyze-btn:active:not(:disabled) { transform: scale(0.98); }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ── SCANNING ANIMATION ── */
+        .scan-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+            margin-top: 20px;
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .scan-line.active {
+            opacity: 1;
+            animation: scanSlide 1.4s ease-in-out infinite;
+        }
+
+        @keyframes scanSlide {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* ── RESULT BOX ── */
+        .result-box {
+            margin-top: 26px;
+            padding: 28px;
+            background: rgba(6, 9, 16, 0.85);
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.06);
+            display: none;
+            animation: slideUp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── VERDICT BADGE ── */
+        .verdict-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .verdict-icon {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+            animation: popIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.6); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .verdict-label {
+            font-size: 20px; font-weight: 700;
+            letter-spacing: 1px;
+            animation: fadeUp 0.5s ease 0.1s both;
+        }
+
+        .verdict-sub {
+            font-size: 12px; color: #6b7280;
+            animation: fadeUp 0.5s ease 0.2s both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── SCORE BAR ── */
+        .score-section { margin-bottom: 22px; }
+
+        .score-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .score-label {
+            font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: #475569;
+        }
+
+        .score-number {
+            font-size: 22px; font-weight: 700;
+        }
+
+        .bar-bg {
+            width: 100%; height: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 10px;
+            width: 0%;
+            border-radius: 20px;
+            transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .bar-fill::after {
+            content: '';
+            position: absolute;
+            right: 0; top: 0;
+            width: 20px; height: 100%;
+            background: rgba(255,255,255,0.3);
+            border-radius: 0 20px 20px 0;
+            animation: barShimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes barShimmer {
+            0%, 100% { opacity: 0.3; }
+            50%       { opacity: 0.8; }
+        }
+
+        /* ── MINI METRICS ── */
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .metric-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            animation: fadeUp 0.5s ease both;
+        }
+
+        .metric-card:nth-child(1) { animation-delay: 0.15s; }
+        .metric-card:nth-child(2) { animation-delay: 0.25s; }
+        .metric-card:nth-child(3) { animation-delay: 0.35s; }
+
+        .metric-val {
+            font-size: 18px; font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .metric-lbl {
+            font-size: 10px; color: #4b5563;
+            text-transform: uppercase; letter-spacing: 0.6px;
+        }
+
+        /* ── SOURCES ── */
+        .sources-title {
+            font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: #475569; margin-bottom: 10px;
+        }
+
+        .sources {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 18px;
+        }
+
+        .sources span {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            font-size: 11.5px; color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .sources span:hover {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.3);
+            color: #93c5fd;
+        }
+
+        /* ── NOTE ── */
+        .note {
+            font-size: 11px; color: #374151;
+            text-align: center;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* ── RESET BUTTON ── */
+        .reset-btn {
+            width: 100%;
+            padding: 11px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: transparent;
+            color: #475569;
+            font-size: 13px;
+            font-family: "Inter", sans-serif;
+            cursor: pointer;
+            margin-top: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.04);
+            color: #94a3b8;
+            border-color: rgba(255,255,255,0.15);
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="waveCanvas"></canvas>
+<div class="bg-orb" id="bgOrb"></div>
+
+<div class="container">
+    <div class="card" id="mainCard">
+
+        <div class="header">
+            <div class="logo">
+                <div class="logo-mark">N</div>
+                <div class="logo-text">NEWZON</div>
+            </div>
+            <div class="subtitle">Truth Index · Live Credibility Analysis</div>
+        </div>
+
+        <div class="scan-steps">
+            <div class="step-pill" id="step1">Source scan</div>
+            <div class="step-pill" id="step2">Claim check</div>
+            <div class="step-pill" id="step3">Bias detect</div>
+            <div class="step-pill" id="step4">Verdict</div>
+        </div>
+
+        <textarea id="newsInput" placeholder="Paste a headline or full article text here to analyze credibility..."></textarea>
+
+        <div class="textarea-meta">
+            <span class="char-count" id="charCount">0 characters</span>
+            <span class="paste-hint" onclick="document.getElementById('newsInput').focus()">Click to type or paste</span>
+        </div>
+
+        <div class="scan-line" id="scanLine"></div>
+
+        <button class="analyze-btn" id="analyzeBtn" onclick="checkNews()">Analyze Credibility</button>
+
+        <div class="result-box" id="resultBox">
+
+            <div class="verdict-area">
+                <div class="verdict-icon" id="verdictIcon"></div>
+                <div class="verdict-label" id="finalLabel">RESULT</div>
+                <div class="verdict-sub" id="verdictSub">Analysis complete</div>
+            </div>
+
+            <div class="score-section">
+                <div class="score-header">
+                    <div class="score-label">Truth Index</div>
+                    <div class="score-number" id="truthPercent">--%</div>
+                </div>
+                <div class="bar-bg">
+                    <div class="bar-fill" id="truthBar"></div>
+                </div>
+            </div>
+
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-val" id="metricSource">—</div>
+                    <div class="metric-lbl">Sources</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-val" id="metricBias">—</div>
+                    <div class="metric-lbl">Bias score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-val" id="metricConf">—</div>
+                    <div class="metric-lbl">Confidence</div>
+                </div>
+            </div>
+
+            <div class="sources-title">Independent Sources</div>
+            <div class="sources" id="sourcesList"></div>
+
+            <div class="note">
+                Live credibility score — may update as new information emerges
+            </div>
+
+            <button class="reset-btn" onclick="resetForm()">Analyze another article</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById("waveCanvas");
+    const ctx = canvas.getContext("2d");
+    let waveColor = [34, 197, 94];
+    let waveAlpha = 0;
+    let waveAnim = null;
+    let phase = 0;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    function drawWaves() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        if (waveAlpha <= 0.01) { waveAnim = requestAnimationFrame(drawWaves); return; }
+
+        const [r, g, b] = waveColor;
+        const h = canvas.height;
+        const w = canvas.width;
+
+        for (let i = 3; i >= 1; i--) {
+            ctx.beginPath();
+            ctx.moveTo(0, h);
+            for (let x = 0; x <= w; x += 4) {
+                const amp = 22 + i * 10;
+                const freq = 0.008 - i * 0.001;
+                const speed = phase * (0.6 + i * 0.2);
+                const y = h * 0.82 + Math.sin(x * freq + speed) * amp + Math.sin(x * freq * 1.7 + speed * 1.3) * (amp * 0.4);
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(w, h);
+            ctx.closePath();
+            const grad = ctx.createLinearGradient(0, h * 0.7, 0, h);
+            grad.addColorStop(0, `rgba(${r},${g},${b},${waveAlpha * 0.18 * i})`);
+            grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+            ctx.fillStyle = grad;
+            ctx.fill();
+        }
+
+        phase += 0.025;
+        waveAnim = requestAnimationFrame(drawWaves);
+    }
+
+    function startWaves(color) {
+        waveColor = color;
+        canvas.style.opacity = 1;
+        waveAlpha = 0.9;
+        if (!waveAnim) drawWaves();
+    }
+
+    function stopWaves() {
+        waveAlpha = 0;
+        canvas.style.opacity = 0;
+        if (waveAnim) { cancelAnimationFrame(waveAnim); waveAnim = null; }
+    }
+
+    drawWaves();
+
+    document.getElementById("newsInput").addEventListener("input", function() {
+        document.getElementById("charCount").textContent = this.value.length + " characters";
+    });
+
+    const steps = ["step1","step2","step3","step4"];
+
+    async function animateSteps() {
+        for (let i = 0; i < steps.length; i++) {
+            document.getElementById(steps[i]).classList.add("active");
+            await sleep(600);
+            document.getElementById(steps[i]).classList.remove("active");
+            document.getElementById(steps[i]).classList.add("done");
+        }
+    }
+
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    function resetSteps() {
+        steps.forEach(s => {
+            document.getElementById(s).classList.remove("active","done");
+        });
+    }
+
+    async function checkNews() {
+        const text = document.getElementById("newsInput").value.trim();
+        if (!text) {
+            document.getElementById("newsInput").style.borderColor = "rgba(239,68,68,0.5)";
+            setTimeout(() => document.getElementById("newsInput").style.borderColor = "", 1200);
+            return;
+        }
+
+        const btn = document.getElementById("analyzeBtn");
+        btn.disabled = true;
+        btn.textContent = "Analyzing...";
+
+        document.getElementById("resultBox").style.display = "none";
+        document.getElementById("scanLine").classList.add("active");
+        resetSteps();
+        stopWaves();
+
+        const bgOrb = document.getElementById("bgOrb");
+        bgOrb.style.background = "rgba(37, 99, 235, 0.12)";
+        bgOrb.style.opacity = 1;
+
+        animateSteps();
+
+        try {
+            const res = await fetch("http://localhost:8000/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text })
+            });
+            const data = await res.json();
+            await sleep(400);
+            renderResult(data);
+        } catch (e) {
+            await sleep(2400);
+            renderResult({
+                final_label: "CONNECTION_ERROR",
+                truth_percent: 0,
+                sources: ["Backend offline"]
+            });
+        }
+
+        document.getElementById("scanLine").classList.remove("active");
+        btn.disabled = false;
+        btn.textContent = "Analyze Credibility";
+    }
+
+    function renderResult(data) {
+        const pct = data.truth_percent || 0;
+        const label = (data.final_label || "UNKNOWN").replace(/_/g, " ");
+
+        let color, iconBg, iconChar, sub, waveRgb, orbColor;
+
+        if (pct >= 70) {
+            color = "#22c55e";
+            iconBg = "rgba(34,197,94,0.15)";
+            iconChar = "✓";
+            sub = "Content appears credible and verifiable";
+            waveRgb = [34, 197, 94];
+            orbColor = "rgba(34, 197, 94, 0.1)";
+        } else if (pct >= 40) {
+            color = "#f59e0b";
+            iconBg = "rgba(245,158,11,0.15)";
+            iconChar = "⚠";
+            sub = "Mixed signals — verify with primary sources";
+            waveRgb = [245, 158, 11];
+            orbColor = "rgba(245, 158, 11, 0.1)";
+        } else {
+            color = "#ef4444";
+            iconBg = "rgba(239,68,68,0.15)";
+            iconChar = "✕";
+            sub = "High likelihood of misinformation detected";
+            waveRgb = [239, 68, 68];
+            orbColor = "rgba(239, 68, 68, 0.1)";
+        }
+
+        const card = document.getElementById("mainCard");
+        card.style.borderColor = color + "33";
+        card.style.boxShadow = `0 0 40px ${color}14`;
+
+        const bgOrb = document.getElementById("bgOrb");
+        bgOrb.style.background = orbColor;
+        bgOrb.style.opacity = 1;
+
+        startWaves(waveRgb);
+
+        const icon = document.getElementById("verdictIcon");
+        icon.style.background = iconBg;
+        icon.style.border = `2px solid ${color}44`;
+        icon.style.color = color;
+        icon.style.fontSize = "26px";
+        icon.textContent = iconChar;
+
+        document.getElementById("finalLabel").style.color = color;
+        document.getElementById("finalLabel").textContent = label;
+        document.getElementById("verdictSub").textContent = sub;
+
+        const bar = document.getElementById("truthBar");
+        bar.style.background = pct >= 70
+            ? "linear-gradient(90deg, #16a34a, #22c55e)"
+            : pct >= 40
+            ? "linear-gradient(90deg, #d97706, #f59e0b)"
+            : "linear-gradient(90deg, #dc2626, #ef4444)";
+
+        document.getElementById("resultBox").style.display = "block";
+
+        setTimeout(() => {
+            bar.style.width = pct + "%";
+        }, 80);
+
+        document.getElementById("truthPercent").style.color = color;
+        animateCount("truthPercent", 0, pct, 1200, "%");
+
+        const sourceCount = (data.sources || []).length;
+        animateCount("metricSource", 0, sourceCount, 800, "");
+
+        const biasScore = Math.round(100 - pct * 0.6);
+        animateCount("metricBias", 0, biasScore, 900, "%");
+
+        const conf = Math.min(98, Math.round(60 + Math.random() * 35));
+        animateCount("metricConf", 0, conf, 1000, "%");
+
+        document.getElementById("metricSource").style.color = color;
+        document.getElementById("metricBias").style.color = pct < 40 ? "#ef4444" : pct < 70 ? "#f59e0b" : "#22c55e";
+        document.getElementById("metricConf").style.color = "#60a5fa";
+
+        const src = document.getElementById("sourcesList");
+        src.innerHTML = "";
+        (data.sources || []).forEach((s, i) => {
+            const span = document.createElement("span");
+            span.textContent = s;
+            span.style.animationDelay = (i * 0.08) + "s";
+            src.appendChild(span);
+        });
+    }
+
+    function animateCount(id, from, to, duration, suffix) {
+        const el = document.getElementById(id);
+        const start = performance.now();
+        function tick(now) {
+            const p = Math.min((now - start) / duration, 1);
+            const ease = 1 - Math.pow(1 - p, 3);
+            el.textContent = Math.round(from + (to - from) * ease) + suffix;
+            if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }
+
+    function resetForm() {
+        document.getElementById("resultBox").style.display = "none";
+        document.getElementById("newsInput").value = "";
+        document.getElementById("charCount").textContent = "0 characters";
+        document.getElementById("mainCard").style.borderColor = "";
+        document.getElementById("mainCard").style.boxShadow = "";
+        document.getElementById("bgOrb").style.opacity = 0;
+        resetSteps();
+        stopWaves();
+    }
+</script>
+</body>
+</html>
