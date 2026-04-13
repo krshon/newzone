@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Newzon Originals</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+<style>
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+background:#0f0f0f;
+}
+
+.page{
+font-family:'Inter',sans-serif;
+color:#e0ddd6;
+min-height:100vh;
+}
+
+/* NAVBAR */
+
+.navbar{
+background:#0a0a0a;
+border-bottom:1px solid #1a1a1a;
+padding:0 4rem;
+display:flex;
+align-items:center;
+justify-content:space-between;
+height:64px;
+}
+
+.logo{
+font-size:18px;
+font-weight:600;
+color:#f0ede6;
+}
+
+.logo span{
+color:#c8a96e;
+}
+
+.nav-links{
+display:flex;
+gap:32px;
+}
+
+.nav-links a{
+font-size:12px;
+color:#666;
+text-decoration:none;
+letter-spacing:.06em;
+text-transform:uppercase;
+}
+
+.nav-links a:hover{
+color:#aaa;
+}
+
+/* MAIN WRAP */
+
+.wrap{
+max-width:980px;
+margin:auto;
+padding:3rem 2rem 4rem;
+}
+
+/* ARTICLE HEADER */
+
+.tag{
+font-size:11px;
+font-weight:600;
+letter-spacing:.12em;
+text-transform:uppercase;
+color:#c8a96e;
+border:1px solid #c8a96e44;
+padding:4px 12px;
+border-radius:2px;
+display:inline-block;
+margin-bottom:1.2rem;
+}
+
+.headline{
+font-size:40px;
+font-weight:600;
+line-height:1.25;
+color:#f0ede6;
+margin-bottom:.8rem;
+max-width:800px;
+}
+
+.meta{
+font-size:13px;
+color:#666;
+margin-bottom:2rem;
+}
+
+/* HERO IMAGE GRID */
+
+.img-grid{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:10px;
+margin-bottom:.6rem;
+}
+
+.img-box{
+background:#1a1a1a;
+height:320px;
+overflow:hidden;
+border-radius:4px;
+}
+
+.img-box img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.caption{
+font-size:12px;
+color:#444;
+margin-bottom:1.4rem;
+}
+
+/* SUMMARY BUTTON */
+
+.summarize-btn{
+width:260px;
+background:transparent;
+border:1px solid #2a2a2a;
+color:#888;
+padding:10px 0;
+font-size:12px;
+letter-spacing:.08em;
+border-radius:3px;
+cursor:pointer;
+margin-bottom:1.4rem;
+}
+
+.summarize-btn:hover{
+border-color:#c8a96e;
+color:#c8a96e;
+}
+
+/* SUMMARY BOX */
+
+.summary-box{
+background:#181818;
+border-left:2px solid #c8a96e;
+padding:1rem 1.3rem;
+font-size:14px;
+line-height:1.7;
+display:none;
+margin-bottom:1.6rem;
+}
+
+.summary-box.visible{
+display:block;
+}
+
+/* BODY TEXT */
+
+.body-text{
+font-size:17px;
+line-height:1.9;
+color:#bdb9b0;
+max-width:760px;
+}
+
+.body-text p{
+margin-bottom:1.2rem;
+}
+
+/* SOURCE ANALYSIS */
+
+.section-label{
+font-size:11px;
+letter-spacing:.13em;
+text-transform:uppercase;
+color:#444;
+margin:2.5rem 0 1rem;
+}
+
+.combined-bar-wrap{
+height:6px;
+background:#1e1e1e;
+border-radius:99px;
+display:flex;
+margin-bottom:.8rem;
+}
+
+.seg{
+height:100%;
+transition:width 1s;
+}
+
+/* FACT SCORE */
+
+.truth-row{
+display:flex;
+align-items:center;
+gap:14px;
+margin-top:1.4rem;
+max-width:400px;
+}
+
+.truth-bar-wrap{
+flex:1;
+height:5px;
+background:#1e1e1e;
+border-radius:99px;
+overflow:hidden;
+}
+
+.truth-fill{
+height:100%;
+background:#3a9e70;
+width:0%;
+transition:width 1s .3s;
+}
+
+/* RELATED STORIES */
+
+.related-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:16px;
+margin-top:2rem;
+}
+
+.related-card{
+background:#141414;
+border:1px solid #1e1e1e;
+border-radius:6px;
+padding:16px;
+cursor:pointer;
+transition:.2s;
+}
+
+.related-card:hover{
+border-color:#333;
+transform:translateY(-2px);
+}
+
+.related-card-title{
+font-size:14px;
+color:#ccc;
+margin-bottom:8px;
+}
+
+.related-card-meta{
+font-size:11px;
+color:#444;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<div class="navbar">
+<div class="logo">Newzon <span>Originals</span></div>
+
+<div class="nav-links">
+<a href="#">India</a>
+<a href="#">World</a>
+<a href="#">Politics</a>
+<a href="#">Economy</a>
+</div>
+</div>
+
+
+<div class="wrap">
+
+<div class="tag">India · Economy</div>
+
+<h1 class="headline">
+RBI Proposes Delay Mechanism for High-Value Digital Payments to Reduce Online Fraud
+</h1>
+
+<p class="meta">
+April 2026 · Reserve Bank Policy Desk · 3 min read
+</p>
+
+
+<div class="img-grid">
+
+<div class="img-box">
+<img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3"/>
+</div>
+
+<div class="img-box">
+<img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d"/>
+</div>
+
+</div>
+
+<p class="caption">
+Left: RBI headquarters in Mumbai. Right: Growth of digital payments across India.
+</p>
+
+
+<button class="summarize-btn"
+onclick="toggleSummary()" id="sum-btn">
+
+↓ Summarise article
+
+</button>
+
+
+<div class="summary-box" id="summary-box">
+
+The Reserve Bank of India has proposed introducing a short delay window for high-value digital transactions above ₹10,000 to curb rising online fraud. The proposal would allow users time to cancel suspicious transfers while strengthening safeguards in India’s fast-growing real-time payments ecosystem.
+
+</div>
+
+
+<div class="body-text">
+
+<p>
+
+The Reserve Bank of India has proposed a new safeguard mechanism that could introduce a short delay before processing certain high-value digital payments, aiming to reduce fraud risks in India’s rapidly expanding online transactions ecosystem.
+
+</p>
+
+<p>
+
+Officials said the measure would primarily apply to first-time transactions between accounts or unusually large transfers exceeding ₹10,000. The delay window would allow users to verify payment authenticity and cancel suspicious activity before completion.
+
+</p>
+
+<p>
+
+India currently processes billions of Unified Payments Interface (UPI) transactions each month, making it one of the world’s fastest-growing digital payment networks. However, authorities have warned that fraud attempts have increased alongside adoption.
+
+</p>
+
+<p>
+
+If implemented, the proposal could balance convenience with security while preserving the speed advantages that made India’s digital payment infrastructure globally influential.
+
+</p>
+
+</div>
+
+
+<div class="section-label">
+
+Source Analysis · 18 sources
+
+</div>
+
+
+<div class="combined-bar-wrap">
+
+<div class="seg" id="s-left"
+style="width:0%;background:#5a82c8"></div>
+
+<div class="seg" id="s-neutral"
+style="width:0%;background:#555"></div>
+
+<div class="seg" id="s-right"
+style="width:0%;background:#c86060"></div>
+
+</div>
+
+
+<div class="truth-row">
+
+<span>Fact score</span>
+
+<div class="truth-bar-wrap">
+<div class="truth-fill" id="t-fill"></div>
+</div>
+
+<span>94%</span>
+
+</div>
+
+
+<div class="related-grid">
+
+<div class="related-card">
+<div class="related-card-title">
+UPI Transactions Cross New Monthly Record
+</div>
+<div class="related-card-meta">
+April 2026 · Economy
+</div>
+</div>
+
+
+<div class="related-card">
+<div class="related-card-title">
+Government Expands Digital Payment Security Framework
+</div>
+<div class="related-card-meta">
+April 2026 · Policy
+</div>
+</div>
+
+
+<div class="related-card">
+<div class="related-card-title">
+Cybercrime Complaints Rise With Payment App Usage
+</div>
+<div class="related-card-meta">
+March 2026 · Crime
+</div>
+</div>
+
+
+<div class="related-card">
+<div class="related-card-title">
+India’s Digital Economy Targets $1 Trillion Milestone
+</div>
+<div class="related-card-meta">
+March 2026 · Economy
+</div>
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+setTimeout(()=>{
+document.getElementById('s-left').style.width='12%'
+document.getElementById('s-neutral').style.width='68%'
+document.getElementById('s-right').style.width='20%'
+},200)
+
+setTimeout(()=>{
+document.getElementById('t-fill').style.width='94%'
+},500)
+
+
+function toggleSummary(){
+
+const box=document.getElementById('summary-box')
+
+const btn=document.getElementById('sum-btn')
+
+const v=box.classList.toggle('visible')
+
+btn.textContent=v?'↑ Hide summary':'↓ Summarise article'
+
+}
+
+</script>
+
+</body>
+</html>

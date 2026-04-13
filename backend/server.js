@@ -8,7 +8,6 @@ const app = express();
 // Serve frontend files
 app.use(express.static(path.join(__dirname, "../frontend/public")));
 
-// Simple news endpoint (no clustering)
 app.get("/api/news", async (req, res) => {
   try {
 
@@ -16,6 +15,7 @@ app.get("/api/news", async (req, res) => {
 
     const cleaned = articles.map(article => ({
       title: article.title,
+      description: article.description, // ✅ now sent to frontend
       image: article.image,
       source: article.source,
       url: article.url

@@ -1,1 +1,3 @@
 C:\Users\krish\OneDrive\Documents\newzone\backend>node server.js
+
+C:\Users\krish\OneDrive\Documents\newzone\videosummarizer>python app.py

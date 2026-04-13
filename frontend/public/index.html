@@ -29,7 +29,8 @@ fetch("/api/news")
       card.innerHTML = `
         <img src="${article.image ? article.image : 'https://via.placeholder.com/400x200?text=No+Image'}" alt="news image">
         <h3>${article.title}</h3>
-        <p>${article.source || ''}</p>
+        <p class="desc">${article.description || "Click to read full article..."}</p>
+        <p class="source">${article.source || ''}</p>
         <a href="${article.url}" target="_blank">Read more</a>
       `;
 
